@@ -1,0 +1,10 @@
+{
+  "name": "project-kickoff",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Interview-driven, test-driven project generator plugin for Claude Code.",
+  "scripts": {
+    "test": "bash tests/smoke-test.sh"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "project-kickoff",
+  "description": "Interview-driven, test-driven project generator. Runs a dynamic questionnaire, then builds a self-verifying starter repo through spec -> plan -> execution, with TDD and a verification gate enforced. No golden reference and no pinned versions in the plugin; variance is controlled by the staged chain and the gate.",
+  "author": {
+    "name": "Prashanth Kolishetti",
+    "email": "kolishetti@gmail.com"
+  },
+  "hooks": "./hooks/hooks.json"
+}

@@ -1,0 +1,213 @@
+---
+name: spec-authoring
+description: Turn a completed project questionnaire into a testable specification. Use this skill immediately after the project questionnaire finishes and answers have been captured, before any planning or code generation. It runs a short chunked interview to deepen the behavioral answers, then emits a spec of Given/When/Then acceptance criteria plus structural presence checks. Trigger whenever you have questionnaire answers and need a spec, whenever someone asks to "write the spec," "turn answers into criteria," or "prepare acceptance criteria," and whenever the next step in a project-kickoff chain is specification. Do not skip straight to planning or building from raw questionnaire answers; they are too thin to test against.
+---
+
+# Spec Authoring
+
+You have a set of questionnaire answers describing a project to build. Nine or so answers are far too thin to build a correct project from, and they are far too thin to *test* a project against. Your job is to turn them into a specification precise enough that every promised behavior maps to a test written before the code exists.
+
+This skill is the second link in the kickoff chain: **questionnaire → spec (you are here) → plan → execution**. You produce the artifact the plan is decomposed from. If your spec is vague, every test downstream is confident and wrong. Precision here is the whole point.
+
+The spec you emit has two parts:
+- **Criteria** — behavioral, written as Given/When/Then, one test each. These get test-driven (red before green).
+- **Checks** — structural, written as flat presence assertions. These get verified by presence-and-boot, never test-driven.
+
+Getting the right things into each list is what makes the downstream TDD real instead of ceremony. The rest of this skill is how.
+
+---
+
+## The behavioral / structural boundary
+
+Sort every feature the questionnaire selected into one of the two lists using this test:
+
+> **Does it have runtime behavior that could be wrong in a way a test would catch?** → behavioral (Criterion).
+> **Is it either present or absent, with no interesting runtime logic?** → structural (Check).
+
+The organizing rule, so you can classify anything not in the table below:
+- **Security boundaries and money are always behavioral.** Auth, tenant isolation, payment/entitlement, admin authorization. Wrong behavior here is silent and severe, which is exactly what tests are for.
+- **Connections, scaffolds, SDKs, and config are always structural.** A wired database, an installed SDK, a valid deploy config. Test-driving these is theater.
+- **Anything touching an LLM's output is structural around the model and behavioral only on the deterministic plumbing.** Never assert on generated prose. Assert on retrieval, routing, tool-invocation, persistence, scoping.
+
+| Questionnaire category | Behavioral (Criteria, TDD) | Structural (Checks, presence) |
+|---|---|---|
+| Project type | the core user flow it implies, if any | scaffold builds & boots |
+| Authentication | all flows: 401s, session set, expiry, logout, redirects | SDK + env present |
+| Database | data rules & invariants, query scoping | connection, migrations, declared schema present |
+| Payments | charge, webhook→entitlement, refund→revoke | SDK, webhook endpoint, keys present |
+| Multi-tenant | **cross-tenant denial** (highest priority) | tenant_id plumbing present |
+| Admin portal | authorization boundary (who is allowed) | pages render & reachable |
+| AI: chat | edge cases: empty input, history scoping | endpoint streams & persists |
+| AI: RAG | retrieval contract & scoping | vector store wired |
+| AI: agents | tool-invocation wiring (right tool, right args) | agent endpoint present |
+| AI: voice | (little to none) | endpoints wired |
+| Mobile companion | the API contract it consumes | app builds & launches |
+| Deployment target | (none) | config valid, target build succeeds |
+
+Note the split categories. Database, admin, and each AI sub-type land in **both** columns: the plumbing is a Check, the rule on top of it is a Criterion. Don't force a whole category into one bucket.
+
+---
+
+## The interview: deepen the behavioral answers
+
+Raw questionnaire answers are flags ("auth: yes"). Criteria need testable specifics ("unauthenticated requests to protected routes return 401"). Bridge that gap with a short interview, run in **digestible chunks with sign-off**, not one giant wall of questions.
+
+**Spend your interview budget proportionally.** The depth of questioning should match how behavioral a category is. Interrogate auth, payments, multi-tenant, and RAG hard, because that is where variance hurts and where tests bite. Breeze through deploy target, scaffold, and voice, because they are structural and there is little to specify. A good interview is lopsided on purpose.
+
+Work one behavioral category per chunk:
+1. State what you're about to pin down ("Let's nail the auth behavior.").
+2. Ask only the questions needed to write testable criteria for that category. Drive toward observable outcomes: status codes, redirects, what's in the DB after, what's denied.
+3. Reflect back the criteria you intend to write, in plain language, and get a yes before moving on.
+
+**Enforce the constraints as you go.** The questionnaire may have produced an incoherent combination. Catch it here, conversationally:
+- RAG selected but no database → ask where vectors live; if there's genuinely no store, the combination is invalid, resolve it before proceeding.
+- Multi-tenant selected → auth criteria must become tenant-aware; every "user can access X" gains an implicit "user of tenant A cannot access tenant B's X."
+- Payments selected but no auth → who owns the entitlement? Resolve the ownership before writing payment criteria.
+
+Chunking matters because a person can actually read and correct four criteria at a time. They cannot meaningfully approve forty at once. The sign-off per chunk is what makes the eventual tests trustworthy, because a human confirmed each behavior is the intended one.
+
+---
+
+## The criterion format
+
+Every behavioral feature emits one or more criteria in this exact shape:
+
+```
+ID:        <feature>-<nnn>          e.g. auth-003, tenant-001
+Feature:   <behavioral category>     e.g. Authentication, Multi-tenant
+Priority:  critical | standard       critical = security boundary or money
+Given:     <preconditions / state>
+When:      <the single action taken>
+Then:      <the observable, assertable result>
+Fixture:   <test data/state that must exist>   (optional)
+Mocked:    <external deps stubbed>              (required when it touches an LLM, payment, or 3rd-party API)
+```
+
+Five rules govern what may be emitted. They are not style preferences; each one prevents a specific downstream failure.
+
+**1. The `Then` must be observable and binary.** It asserts something a test can mechanically check: a status code, a row present or absent, a cookie set, a function called with given args. If a `Then` says "is secure," "works correctly," or "handles properly," it names a wish, not an assertion. A test can't fail against it, so it isn't a criterion.
+
+**2. One criterion, one behavior.** No `and` in the `Then` hiding two assertions. "Returns 401 and logs the attempt" is two criteria. Atomic criteria mean a red test names exactly one broken behavior.
+
+**3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it.
+
+**4. `Mocked` is mandatory whenever an external dependency appears.** Payments name the stub (test-mode signed webhook, faked charge). AI names the mocked model response. Any third-party API names its stub. A criterion that touches Stripe or an LLM with a blank `Mocked` field is malformed. This forces the test-isolation decision into the spec instead of leaving the agent to improvise it (or hit a live API) mid-build.
+
+**5. `critical` is reserved for security boundaries and money.** Auth, multi-tenant isolation, payment/entitlement, admin authorization. Critical criteria get the deny-pair requirement, get ordered first in the plan, and are non-negotiable in the verify gate. Everything else behavioral is `standard`.
+
+### Worked examples
+
+```
+ID:       auth-001
+Feature:  Authentication
+Priority: critical
+Given:    no active session
+When:     GET /api/projects
+Then:     response status is 401
+```
+```
+ID:       auth-002
+Feature:  Authentication
+Priority: critical
+Given:    a valid user credential
+When:     POST /api/login with that credential
+Then:     response sets an httpOnly session cookie
+```
+```
+ID:       tenant-001
+Feature:  Multi-tenant
+Priority: critical
+Given:    user U belongs to tenant A; resource R belongs to tenant B
+When:     U requests GET /api/resources/R
+Then:     response status is 403 and body contains no fields of R
+Fixture:  tenant A with user U; tenant B with resource R
+```
+```
+ID:       pay-004
+Feature:  Payments
+Priority: critical
+Given:    a checkout session for user U
+When:     a payment_succeeded webhook for that session is received
+Then:     user U's entitlement record is set to active
+Mocked:   Stripe webhook event (test-mode signed payload)
+```
+```
+ID:       rag-002
+Feature:  AI / RAG
+Priority: standard
+Given:    a corpus containing document D with a unique marker phrase
+When:     a retrieval query for that marker runs
+Then:     document D's chunk is in the returned set
+Fixture:  corpus seeded with D
+Mocked:   embedding model returns fixed vectors; LLM generation stubbed
+```
+
+`rag-002` tests retrieval mechanics, not answer quality, and mocks the model. The format carried the AI rule automatically — follow the same instinct everywhere an LLM appears.
+
+---
+
+## The check format
+
+Structural features do **not** use Given/When/Then. Forcing that shape onto "tsconfig exists" is the theater the boundary exists to prevent. Emit a flat presence assertion:
+
+```
+ID:      struct-<area>-<nnn>
+Type:    presence
+Check:   <a single, mechanically verifiable statement of existence or boot>
+```
+
+Examples:
+```
+ID:      struct-deploy-001
+Type:    presence
+Check:   vercel.json exists and is valid JSON
+```
+```
+ID:      struct-db-001
+Type:    presence
+Check:   app boots with a live DB connection and all declared schema tables exist
+```
+
+---
+
+## Self-check before emitting (this is what makes the format real)
+
+A format is only enforced if you refuse to emit anything that violates it. Before writing the spec file, run each criterion through this gate. Any failure means rewrite that criterion — do not emit it malformed.
+
+- Is the `Then` observable and binary? (No "secure/correct/properly.")
+- Is it exactly one behavior? (No hidden `and`.)
+- If `critical`: does it have its allow/deny partner?
+- If it touches an LLM, payment, or third-party API: is `Mocked` filled?
+- Does every behavioral category the questionnaire selected have at least one criterion?
+- Does every structural category have at least one check?
+
+If a criterion can't be made to pass this gate, the underlying answer is still too vague — go back to the interview for that one category rather than emitting a criterion no honest test can be written from. This refusal is the point. It is the same move brainstorming makes when it won't proceed on a fuzzy design.
+
+---
+
+## Output
+
+Write `spec.md` to the project root and get final sign-off. Structure:
+
+```markdown
+# Project Specification
+
+## Summary
+<2-4 sentences: what this project is, from the questionnaire answers>
+
+## Selected modules
+<the questionnaire answers, as a flat list>
+
+## Acceptance criteria (behavioral — test-driven)
+<every criterion, grouped by Feature, critical first>
+
+## Structural checks (presence-verified)
+<every check, grouped by area>
+
+## Open questions
+<anything the interview couldn't resolve; empty is good>
+```
+
+`spec.md` is a permanent artifact. Commit it into the project. The plan skill decomposes it: each **criterion** becomes one `[TDD]` task (write failing test → implement → green), each **check** becomes one `[STRUCT]` task (present-and-boot). The `ID` is the join key that lets every task, test, and failure trace back to one line of this spec — so keep IDs stable and unique.
+
+Definition of done for the whole downstream build, stated in this spec's own terms: every criterion has a passing test, every `critical` criterion has both its allow and deny test passing, every check passes, and the app boots. Every noun in that sentence is something you emit here. That is why this skill is load-bearing.

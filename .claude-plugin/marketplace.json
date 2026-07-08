@@ -1,0 +1,15 @@
+{
+  "name": "project-kickoff-marketplace",
+  "owner": {
+    "name": "Prashanth Kolishetti"
+  },
+  "description": "Interview-driven, test-driven project scaffolding for Claude Code.",
+  "plugins": [
+    {
+      "name": "project-kickoff",
+      "source": "./",
+      "description": "Runs a dynamic questionnaire, then builds a self-verifying starter repo through a spec -> plan -> execution chain with TDD enforced.",
+      "skills": ["./skills/"]
+    }
+  ]
+}
