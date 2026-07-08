@@ -9,7 +9,7 @@ A Claude Code plugin that scaffolds a new, self-verifying project through a stag
 ## Layout
 
 ```
-.claude-plugin/plugin.json        plugin manifest (declares the hooks file)
+.claude-plugin/plugin.json        plugin manifest
 .claude-plugin/marketplace.json   catalog; lists this plugin with source "./"
 commands/kickoff.md               /kickoff entry command
 hooks/hooks.json                  SessionStart wiring

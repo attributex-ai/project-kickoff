@@ -19,7 +19,7 @@ An interview becomes a testable spec, the spec becomes a tagged plan, the plan b
 ```
 project-kickoff/
 ├── .claude-plugin/
-│   ├── plugin.json               # plugin manifest (declares the hooks file)
+│   ├── plugin.json               # plugin manifest
 │   └── marketplace.json          # catalog; lists this plugin with source "./"
 ├── commands/
 │   └── kickoff.md                # /kickoff entry command
@@ -45,7 +45,7 @@ project-kickoff/
 └── README.md
 ```
 
-Skills load from the default `skills/` scan (the marketplace entry lists `./skills/` to force a full scan under the root source). Commands load from `commands/`. The hook is declared in `plugin.json`.
+Skills load from the default `skills/` scan (the marketplace entry lists `./skills/` to force a full scan under the root source). Commands load from `commands/`. The hook loads automatically from `hooks/hooks.json` (standard location; it must not also be declared in `plugin.json`).
 
 ## Validate
 

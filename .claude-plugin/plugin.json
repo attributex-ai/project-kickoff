@@ -4,6 +4,5 @@
   "author": {
     "name": "Prashanth Kolishetti",
     "email": "kolishetti@gmail.com"
-  },
-  "hooks": "./hooks/hooks.json"
+  }
 }
