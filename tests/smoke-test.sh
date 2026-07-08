@@ -19,6 +19,7 @@ check "marketplace.json exists" "[ -f '$root/.claude-plugin/marketplace.json' ]"
 check "plugin.json is valid JSON"      "python3 -c \"import json;json.load(open('$root/.claude-plugin/plugin.json'))\" 2>/dev/null"
 check "marketplace.json is valid JSON" "python3 -c \"import json;json.load(open('$root/.claude-plugin/marketplace.json'))\" 2>/dev/null"
 check "hooks.json is valid JSON"       "python3 -c \"import json;json.load(open('$root/hooks/hooks.json'))\" 2>/dev/null"
+check "plugin.json does not declare hooks (loads by convention)" "! grep -q '\"hooks\"' '$root/.claude-plugin/plugin.json'"
 
 # Entry command
 check "kickoff command exists" "[ -f '$root/commands/kickoff.md' ]"

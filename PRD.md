@@ -50,7 +50,7 @@ Superpowers is not a rigid 4-step chain — it's many small skills that trigger 
 
 Superpowers' "magic" is that skills fire automatically — driven by a session-start hook that injects a bootstrap plus trigger-oriented skill descriptions. Adopted, but scoped to avoid noise: `hooks/greenfield-nudge.sh` runs at SessionStart and suggests `/kickoff` **only when the working directory is near-empty**. It's fully defensive and always exits 0. Combined with the `using-project-kickoff` bootstrap skill and trigger-worded descriptions, the chain can start without the user remembering a command — while staying silent in real repos.
 
-This is the one piece most likely to need adjustment against a specific Claude Code version. If `claude plugin validate` objects, drop the `"hooks"` line from `plugin.json` and delete `hooks/`; the rest works unchanged.
+This is the one piece most likely to need adjustment against a specific Claude Code version. If `claude plugin validate` objects, drop the `"hooks"` line from `plugin.json` and delete `hooks/`; the rest works unchanged. *(Superseded: the `"hooks"` line itself proved to be a load-blocking duplicate and was removed in commit 594da6d; `hooks/hooks.json` loads by convention.)*
 
 ---
 

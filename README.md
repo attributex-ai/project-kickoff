@@ -74,7 +74,7 @@ Suggested first test input: SaaS, auth yes, Postgres, payments yes, multi-tenant
 Push to GitHub, then users add it directly:
 
 ```
-/plugin marketplace add <owner>/project-kickoff
+/plugin marketplace add attributex-ai/project-kickoff
 /plugin install project-kickoff@project-kickoff-marketplace
 ```
 
@@ -86,9 +86,4 @@ For separate stable/latest channels, or to keep the catalog in its own repo, see
 
 ## The session-start nudge
 
-`hooks/greenfield-nudge.sh` runs at session start and suggests `/kickoff` only when the working directory is near-empty, so it stays silent in populated repos. It is fully defensive and always exits 0. If `claude plugin validate` objects to the hook, remove the `"hooks"` line from `plugin.json` and delete `hooks/` — everything else works without it.
-
-## Before you publish
-
-- Replace `Your Name` in `LICENSE` and `.claude-plugin/marketplace.json`.
-- Confirm the marketplace `name` isn't one of Anthropic's reserved names.
+`hooks/greenfield-nudge.sh` runs at session start and suggests `/kickoff` only when the working directory is near-empty, so it stays silent in populated repos. It is fully defensive and always exits 0. If a future Claude Code version objects to the hook, delete `hooks/` and drop the hook checks from `tests/smoke-test.sh` — everything else works without it. (Do not declare the hooks file in `plugin.json`; `hooks/hooks.json` loads automatically, and a duplicate declaration prevents the plugin from loading.)

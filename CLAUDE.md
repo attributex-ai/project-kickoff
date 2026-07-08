@@ -38,4 +38,4 @@ Orientation: `using-project-kickoff` (bootstrap; explains the chain and when to 
 
 ## Before publishing
 
-Replace `Your Name` in `LICENSE` and `marketplace.json`, and confirm the marketplace `name` isn't reserved.
+The marketplace `name` must stay off Anthropic's reserved-names list (see the plugin-marketplaces docs).
