@@ -53,12 +53,14 @@ Keep implementation notes short. You're sequencing and framing the work, not wri
 
 Order is not cosmetic — it front-loads risk and keeps the build bootable at every step.
 
-1. **Foundation `[STRUCT]` first.** Scaffold, database connection, env config. Nothing behavioral can be tested until the app boots, so these come first even though they're not test-driven.
+1. **Foundation `[STRUCT]` first.** Scaffold, database connection, env config — and, if a design was imported, the **design foundation**: the token file, self-hosted fonts, and the global stylesheet wired into the app shell. Nothing behavioral can be tested and no screen can be styled until the app boots with the theme applied, so these come first even though they're not test-driven.
 2. **Critical `[TDD]` next, in this order:** authentication → multi-tenant isolation → payments/entitlement → admin authorization. These are the security-and-money boundaries. They're the highest-risk behavior and everything else assumes they work, so they get built and proven early.
 3. **Standard `[TDD]`** — the remaining behavioral features (chat edge cases, RAG retrieval, agent tool-wiring, etc.).
 4. **Remaining `[STRUCT]`** — deploy config, secondary presence checks, anything that just needs to exist.
 
 Within the critical block, respect dependencies: auth before anything tenant-aware, tenancy before tenant-scoped payments.
+
+**Design tasks after the critical block.** The design *foundation* (tokens, fonts, global theme) is wired early in step 1 because everything visual depends on it. But component-library `[STRUCT]` tasks and per-screen build tasks come after the critical security-and-money `[TDD]` block — design must never jump ahead of auth, tenancy, or payments. A screen that consumes a behavioral endpoint (a chat UI over its endpoint, an admin table over its API) is planned after that endpoint's `[TDD]` tasks are green, so the UI is built against a proven contract.
 
 ---
 

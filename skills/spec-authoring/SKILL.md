@@ -28,6 +28,7 @@ The organizing rule, so you can classify anything not in the table below:
 - **Security boundaries and money are always behavioral.** Auth, tenant isolation, payment/entitlement, admin authorization. Wrong behavior here is silent and severe, which is exactly what tests are for.
 - **Connections, scaffolds, SDKs, and config are always structural.** A wired database, an installed SDK, a valid deploy config. Test-driving these is theater.
 - **Anything touching an LLM's output is structural around the model and behavioral only on the deterministic plumbing.** Never assert on generated prose. Assert on retrieval, routing, tool-invocation, persistence, scoping.
+- **Design and visual systems are structural, never test-driven.** You never write a test that asserts a color, a spacing value, or a copy string. A design is present-and-renders: the token file exists and is wired, the named components render, the theme is applied instead of default browser styling. The only behavioral slice is accessibility (visible focus, AA contrast on core text), and even that stays a presence/render check unless a deterministic a11y tool is wired. Asserting on visual output is the same theater as asserting on generated prose. When a design was imported, its checks come from the `design/DESIGN.md` manifest the `design-import` skill produced.
 
 | Questionnaire category | Behavioral (Criteria, TDD) | Structural (Checks, presence) |
 |---|---|---|
@@ -43,6 +44,7 @@ The organizing rule, so you can classify anything not in the table below:
 | AI: voice | (little to none) | endpoints wired |
 | Mobile companion | the API contract it consumes | app builds & launches |
 | Deployment target | (none) | config valid, target build succeeds |
+| Design / UI (if imported) | a11y only: visible focus, AA contrast on core text | token file present & globally imported, fonts load, each named component present & renders, brand assets present, app renders with the theme applied |
 
 Note the split categories. Database, admin, and each AI sub-type land in **both** columns: the plumbing is a Check, the rule on top of it is a Criterion. Don't force a whole category into one bucket.
 
@@ -63,6 +65,7 @@ Work one behavioral category per chunk:
 - RAG selected but no database → ask where vectors live; if there's genuinely no store, the combination is invalid, resolve it before proceeding.
 - Multi-tenant selected → auth criteria must become tenant-aware; every "user can access X" gains an implicit "user of tenant A cannot access tenant B's X."
 - Payments selected but no auth → who owns the entitlement? Resolve the ownership before writing payment criteria.
+- Design imported → the reconciliation is already done (the `design-import` skill resolved identity, copy, screens-in-scope, and source-of-truth conflicts with the user). Read `design/DESIGN.md` and turn its component inventory and token/font/asset entries into structural checks — one per named component, plus the token/fonts/theme-applied checks. Do not re-litigate the design; do encode what the manifest promises so it can't silently vanish from the build.
 
 Chunking matters because a person can actually read and correct four criteria at a time. They cannot meaningfully approve forty at once. The sign-off per chunk is what makes the eventual tests trustworthy, because a human confirmed each behavior is the intended one.
 
@@ -180,6 +183,7 @@ A format is only enforced if you refuse to emit anything that violates it. Befor
 - If it touches an LLM, payment, or third-party API: is `Mocked` filled?
 - Does every behavioral category the questionnaire selected have at least one criterion?
 - Does every structural category have at least one check?
+- If a design was imported: does the spec include structural checks for the token file (present + globally imported), fonts, each named component in the manifest, brand assets, and the app rendering with the theme applied?
 
 If a criterion can't be made to pass this gate, the underlying answer is still too vague — go back to the interview for that one category rather than emitting a criterion no honest test can be written from. This refusal is the point. It is the same move brainstorming makes when it won't proceed on a fuzzy design.
 

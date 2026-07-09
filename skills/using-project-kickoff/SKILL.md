@@ -15,12 +15,13 @@ Do **not** start the chain for changes to an existing, populated codebase. This 
 
 ## The chain
 
-Four stages, each producing a committed artifact the next consumes:
+Four stages, plus one conditional, each producing a committed artifact the next consumes:
 
-1. **`questionnaire`** — a dynamic, branching interview. Prunes questions that don't apply and rejects incoherent combinations. Captures answers.
-2. **`spec-authoring`** — deepens the answers into a testable `spec.md`: Given/When/Then acceptance criteria for behavior, presence checks for structure. Chunked human sign-off.
-3. **`planning`** — turns the spec into `plan.md`: tagged `[TDD]` and `[STRUCT]` tasks, critical security-and-money work first, mocks named.
-4. **`execution`** — builds the project by working the plan.
+1. **`questionnaire`** — a dynamic, branching interview. Prunes questions that don't apply and rejects incoherent combinations. Captures answers — including the **design source** (a Claude Design project, a described direction, or none).
+2. **`design-import`** *(conditional — runs only when a design source was given)* — pulls the design from Claude Design (or a described direction), materializes tokens, fonts, brand assets, and a component inventory into the project as standalone files, reconciles it against the answers, and emits a `design/DESIGN.md` manifest the spec consumes. Skipped entirely when the design source is "none."
+3. **`spec-authoring`** — deepens the answers into a testable `spec.md`: Given/When/Then acceptance criteria for behavior, presence checks for structure (including design presence/render checks when a design was imported). Chunked human sign-off.
+4. **`planning`** — turns the spec into `plan.md`: tagged `[TDD]` and `[STRUCT]` tasks, critical security-and-money work first, design foundation wired early, mocks named.
+5. **`execution`** — builds the project by working the plan.
 
 ## The disciplines that run across the chain
 

@@ -13,7 +13,7 @@ This is the final stage: **questionnaire -> spec -> plan -> execution.** It orch
 
 **Assemble, don't improvise.** Work strictly from the approved plan. Don't add behavior the spec didn't promise — if the build obviously needs something the plan lacks, that's a plan gap: note it, don't silently invent it.
 
-**The generated project stands alone.** When you finish, someone can clone this project *without this plugin installed* and it builds, tests, and runs. Nothing generated may reference the plugin at runtime — not the verify script, not the tests, not the code. The plugin builds the project and walks away.
+**The generated project stands alone.** When you finish, someone can clone this project *without this plugin installed* and it builds, tests, and runs. Nothing generated may reference the plugin at runtime — not the verify script, not the tests, not the code. The plugin builds the project and walks away. This extends to an imported design: tokens, fonts, and brand assets are materialized into the project as real files (the `design-import` skill did this), and the app never fetches from claude.ai/design or a remote font host at runtime. Imported component specs are *translated* into the project's own framework components — Claude Design ships static HTML; the project gets typed components in the target stack — never copied in as-is or referenced remotely.
 
 ## Working the plan
 
@@ -22,6 +22,8 @@ Go top to bottom. The plan is ordered to keep the app bootable and to front-load
 **For each `[STRUCT]` task:** create what it names (scaffold, connection, config, dependency), confirm it's present and the app still boots, move on. Do not test-drive these — `verification-before-completion` presence-checks them.
 
 **For each `[TDD]` task:** hand off to the `test-driven-development` skill and run its full red-green cycle — failing test first, then minimal code, then green. Do not implement behavioral code any other way.
+
+**Design foundation runs early; design tasks are `[STRUCT]`.** If the plan has design-foundation tasks (token file, fonts, global stylesheet), work them right after scaffold so every later screen is built against the theme, not restyled afterward. Component and screen tasks are structural present-and-render work — build the component to the manifest's spec, confirm it renders, move on. Do not test-drive design and do not assert on colors or copy.
 
 **Dependencies:** install as tasks require them. Choose current, compatible versions and let the lockfile pin them — copy resolved versions into the lockfile rather than leaving them floating. When a task needs a package, add it; don't defer.
 

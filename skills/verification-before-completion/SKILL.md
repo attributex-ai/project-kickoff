@@ -21,6 +21,8 @@ The script runs, in order, failing loudly on the first failure:
 
 Output must be legible: on failure, surface the real error (failing test name, stack trace), not a truncated summary. You and the user will read it later.
 
+If a design was imported, the boot step also confirms — **deterministically, not by pixel comparison** — that the theme is actually applied: e.g. the token stylesheet is linked in the rendered document, or a known token custom property resolves on the root element. Presence and render only; never assert exact colors or spacing (that is the same theater the behavioral/structural boundary forbids). Visual-regression testing is a valid future add-on, but it stays out of this deterministic, offline gate.
+
 ## The two halves of done
 
 A green verify proves **correctness**. It does not prove **completeness** — that everything the user asked for is present. An agent under pressure can silently drop a hard module, and a build with a missing feature still compiles. So check both:
@@ -32,6 +34,7 @@ A green verify proves **correctness**. It does not prove **completeness** — th
 - Every `critical` criterion has **both** members of its allow/deny pair passing.
 - Every structural category has its `[STRUCT]` check satisfied.
 - Every module the questionnaire selected is physically present and wired.
+- If a design was imported: the token file is present and globally imported, fonts load, every component named in `design/DESIGN.md` is present, brand assets are present, and the app renders with the theme applied rather than default browser styles. A build that compiles with unstyled placeholder pages is **not** complete.
 
 If anything the spec promised is missing, the build is **not done** — return to execution and build it. "Compiles and boots" is necessary, not sufficient.
 

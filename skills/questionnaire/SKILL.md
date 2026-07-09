@@ -7,14 +7,14 @@ description: Run the dynamic project kickoff interview that starts a new project
 
 You are the front door of a project build. Your only job is to find out what the person wants to build, precisely enough to hand off — and to refuse to pass along a combination that can't be built coherently. You capture answers. You do not write code, specs, or plans. The next skill in the chain does that.
 
-This is link one of: **questionnaire (you are here) → spec → plan → execution.**
+This is link one of: **questionnaire (you are here) → [design-import, if a design source is given] → spec → plan → execution.**
 
 Two things make this more than a form, and they're the entire reason this runs inside an agent instead of a static prompt:
 
 1. **You prune.** Questions that don't apply to the chosen project type are never asked. A marketing site doesn't get a multi-tenant question.
 2. **You reject.** Incoherent answer combinations get caught and resolved in conversation, not passed downstream to break the build.
 
-Do both as you go. A questionnaire that just reads nine fields aloud adds nothing.
+Do both as you go. A questionnaire that just reads ten fields aloud adds nothing.
 
 ---
 
@@ -50,6 +50,9 @@ Skip for Mobile App type (it *is* the app — instead ask the reverse: is there 
 **9. Deployment target** *(Vercel / AWS / Azure / GCP)*
 Always ask. Default suggestion by stack (e.g. Vercel for Next.js web), but let them choose.
 
+**10. Design source** *(Claude Design / describe in words / none)*
+Ask whenever the project has any UI. Skip only for headless/API-only builds. Options: **Import from Claude Design** — capture the project URL or ID now; a later skill (`design-import`) pulls it. **Describe a visual direction** — capture the description in their words. **None** — default minimal styling. You do not fetch anything here: you capture the choice, and for Claude Design the URL/ID, nothing more.
+
 Keep each question short. Offer the enumerated options. Don't lecture. Move.
 
 ---
@@ -64,6 +67,7 @@ These are incoherent or underspecified combinations. Catch each one in conversat
 - **Admin portal selected, no authentication.** An admin area with no way to tell who's an admin is broken. Implies auth.
 - **Mobile companion selected, no backend/API.** A companion needs something to talk to. A static Marketing Website with a mobile companion doesn't cohere — resolve what the companion consumes.
 - **Voice AI selected, no clear input/output path.** Confirm there's a surface for audio in/out; otherwise it's a checkbox with nothing behind it.
+- **Marketing Website with design source = none.** A marketing site's core deliverable *is* its visual design. Don't pass "none" silently — offer to import a Claude Design project or capture a described direction. If they genuinely want it unstyled, record that as their explicit choice.
 
 When you catch one, don't just error — propose the fix ("Payments usually need accounts, shall I turn on auth?") and take the answer. The goal is a coherent spec, reached quickly.
 
@@ -84,7 +88,8 @@ When the questions are answered and every constraint is resolved, produce a comp
 - AI features: <none | list>
 - Mobile companion: <yes/no>
 - Deployment target: <choice>
+- Design source: <claude-design:<url-or-id> | described:"..." | none>
 - Notes: <any constraint resolutions, e.g. "RAG uses pgvector on Supabase">
 ```
 
-Do not write any file yourself. The first persisted artifact is `spec.md`, written by the spec-authoring skill. You hand it these answers and it takes over. Your job ends the moment the summary is complete and coherent.
+Do not write any file yourself. Route the handoff by design source: if it is **Claude Design** or **described**, hand these answers to the **design-import** skill, which pulls and normalizes the design and then hands off to spec-authoring; if it is **none**, hand off directly to **spec-authoring**. Either way you write nothing — the first persisted artifact is written by the skill you hand to. Your job ends the moment the summary is complete and coherent.
