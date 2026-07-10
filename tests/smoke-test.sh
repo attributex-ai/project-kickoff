@@ -28,8 +28,9 @@ check "kickoff command exists" "[ -f '$root/commands/kickoff.md' ]"
 check "hook script exists"       "[ -f '$root/hooks/greenfield-nudge.sh' ]"
 check "hook script is executable" "[ -x '$root/hooks/greenfield-nudge.sh' ]"
 
-# All eight skills present with SKILL.md
-for s in using-project-kickoff questionnaire spec-authoring planning \
+# Every skill in the chain is present with a SKILL.md.
+# This list is the assertion — each named skill MUST exist — so add new skills here.
+for s in using-project-kickoff questionnaire design-import spec-authoring planning \
          test-driven-development execution verification-before-completion systematic-debugging; do
   check "skill '$s' has SKILL.md" "[ -f '$root/skills/$s/SKILL.md' ]"
 done

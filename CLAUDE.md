@@ -14,13 +14,13 @@ A Claude Code plugin that scaffolds a new, self-verifying project through a stag
 commands/kickoff.md               /kickoff entry command
 hooks/hooks.json                  SessionStart wiring
 hooks/greenfield-nudge.sh         nudges /kickoff only in near-empty dirs
-skills/                           the eight skills (the actual product)
+skills/                           the skills (the actual product)
 tests/smoke-test.sh               structural self-test (npm test)
 ```
 
 ## The skills
 
-Chain (staged, each emits a committed artifact): `questionnaire` -> `spec-authoring` -> `planning` -> `execution`.
+Chain (staged, each emits a committed artifact): `questionnaire` -> `design-import` -> `spec-authoring` -> `planning` -> `execution`. `design-import` is the conditional link — it runs only when the questionnaire captured a design source, and is skipped entirely for source "none".
 Disciplines (invoked across the chain): `test-driven-development`, `verification-before-completion`, `systematic-debugging`.
 Orientation: `using-project-kickoff` (bootstrap; explains the chain and when to start it).
 

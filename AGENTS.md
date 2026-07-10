@@ -12,9 +12,10 @@ If your agent has no plugin install for this, run the chain by following the ski
 
 1. `skills/using-project-kickoff/SKILL.md` — orientation and when to start
 2. `skills/questionnaire/SKILL.md` — the dynamic interview
-3. `skills/spec-authoring/SKILL.md` — answers into a testable `spec.md`
-4. `skills/planning/SKILL.md` — `spec.md` into a tagged `plan.md`
-5. `skills/execution/SKILL.md` — build the plan, which invokes:
+3. `skills/design-import/SKILL.md` — *(only when the questionnaire captured a design source)* pulls the design into standalone project files plus a manifest the spec consumes; skipped for source "none"
+4. `skills/spec-authoring/SKILL.md` — answers into a testable `spec.md`
+5. `skills/planning/SKILL.md` — `spec.md` into a tagged `plan.md`
+6. `skills/execution/SKILL.md` — build the plan, which invokes:
    - `skills/test-driven-development/SKILL.md`
    - `skills/verification-before-completion/SKILL.md`
    - `skills/systematic-debugging/SKILL.md`
