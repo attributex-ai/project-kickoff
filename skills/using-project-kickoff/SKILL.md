@@ -27,9 +27,11 @@ Four stages, plus one conditional. From spec-authoring on, every stage produces 
 
 These are not stages; they are always-on rules the execution stage invokes:
 
-- **`test-driven-development`** — every behavioral task goes red-green: failing test first, then the code that passes it. This is the reliability engine.
-- **`verification-before-completion`** — "done" means a green verify gate *and* every promised module present. Never the agent's say-so.
-- **`systematic-debugging`** — when the gate is red, follow a structured root-cause process instead of guessing.
+- **`project-kickoff:test-driven-development`** — every behavioral task goes red-green: failing test first, then the code that passes it. This is the reliability engine.
+- **`project-kickoff:verification-before-completion`** — "done" means a green verify gate *and* every promised module present. Never the agent's say-so.
+- **`project-kickoff:systematic-debugging`** — when the gate is red, follow a structured root-cause process instead of guessing.
+
+Other installed plugins may ship skills with these same names. Within this chain, always invoke the project-kickoff-namespaced variants — only they write the verify script, enforce the tag discipline, and check completeness against spec.md.
 
 ## The two rules that never bend
 

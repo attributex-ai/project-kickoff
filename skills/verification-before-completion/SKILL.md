@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Decide whether a generated project is actually done. Use this skill at the end of the execution stage, before reporting a build complete, and any time you are about to claim a project is finished or working. It writes and runs a self-contained verify script and checks two things: correctness (installs, typechecks, builds, boots, tests pass) and completeness (every module the spec promised is present and wired). "Done" is a green gate plus full coverage of the spec, never the agent's say-so. Trigger before declaring any build complete.
+description: Decide whether a generated project is actually done, and write its verify script. Use this skill twice: early in the execution stage, right after the foundation [STRUCT] tasks, to write the self-contained verify script into the project; and at the end, before reporting a build complete or any time you are about to claim a project is finished or working. It checks two things: correctness (installs, typechecks, builds, boots, tests pass) and completeness (every module the spec promised is present and wired). "Done" is a green gate plus full coverage of the spec, never the agent's say-so. This is the project-kickoff chain's definition of done — it writes the generated project's standalone verify script and checks completeness against spec.md. Trigger before declaring any build complete.
 ---
 
 # Verification Before Completion
@@ -49,7 +49,7 @@ If anything the spec promised is missing, the build is **not done** — return t
 ```
 run verify
   -> green: proceed to the completeness check
-  -> red:  hand off to systematic-debugging, fix the specific cause, run verify again
+  -> red:  hand off to project-kickoff:systematic-debugging, fix the specific cause, run verify again
 ```
 
 The script must be re-runnable back-to-back: it owns the lifecycle of anything it starts, and a second run must never fail because the first left a process or a port behind.

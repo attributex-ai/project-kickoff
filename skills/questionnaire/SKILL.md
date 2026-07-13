@@ -1,6 +1,6 @@
 ---
 name: questionnaire
-description: Run the dynamic project kickoff interview that starts a new project build. Use this skill the moment someone wants to scaffold, generate, or kick off a new project, or runs the /kickoff command, or says "start a new project," "spin up a project," or "build me a SaaS/dashboard/API." It asks a short, branching set of questions, prunes questions that don't apply, and rejects incoherent combinations before anything is built. It captures answers only; it does not write code. When it finishes it hands off to design-import when a design source was captured, otherwise to spec-authoring. Trigger this before any spec, plan, or code generation for a new project.
+description: Run the dynamic project kickoff interview that starts a new project build. Use this skill the moment someone wants to scaffold, generate, or kick off a new project, or runs the /kickoff command, or says "start a new project," "spin up a project," or "build me a SaaS/dashboard/API" — for a new project in an empty or near-empty directory. Do not trigger for adding features to an existing, populated codebase. It asks a short, branching set of questions, prunes questions that don't apply, and rejects incoherent combinations before anything is built. It captures answers only; it does not write code. When it finishes it hands off to design-import when a design source was captured, otherwise to spec-authoring. Trigger this before any spec, plan, or code generation for a new project.
 ---
 
 # Project Kickoff Questionnaire

@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Enforce true red-green test-driven development for every behavioral task in a build. Use this skill during the execution stage whenever implementing a task tagged [TDD], or any time a behavioral feature (a security boundary, money, or a business rule) is being built. It requires a failing test written and run before any implementation, and it forbids writing implementation first. It applies only to behavioral work; structural presence (scaffold, config, connections) is verified, not test-driven. Trigger before writing any behavioral code.
+description: Enforce true red-green test-driven development for every behavioral task in a build. Use this skill during the execution stage whenever implementing a task tagged [TDD], or any time a behavioral feature (a security boundary, money, or a business rule) is being built. It requires a failing test written and run before any implementation, and it forbids writing implementation first. It applies only to behavioral work; structural presence (scaffold, config, connections) is verified, not test-driven. This is the project-kickoff chain's TDD discipline, for tasks tagged [TDD] in a plan.md produced by the planning skill. Trigger before writing any behavioral code.
 ---
 
 # Test-Driven Development
@@ -11,7 +11,7 @@ TDD is the reliability mechanism for this whole system, not a stylistic preferen
 
 Apply TDD to `[TDD]` tasks — behavior that could be wrong in a way a test catches: authentication flows, tenant isolation, payment/entitlement, admin authorization, data invariants, RAG retrieval mechanics, agent tool-routing. The plan's tags already encode the classification — obey the tag, never reclassify mid-build; a wrong-looking tag is a spec/plan gap: stop and flag it. The boundary itself is defined in the `spec-authoring` skill.
 
-Do **not** test-drive `[STRUCT]` tasks. Writing a red-green test for "tsconfig exists" or "the DB is connected" is theater. Those are handled by `verification-before-completion` as presence checks.
+Do **not** test-drive `[STRUCT]` tasks. Writing a red-green test for "tsconfig exists" or "the DB is connected" is theater. Those are handled by `project-kickoff:verification-before-completion` as presence checks.
 
 Never test an LLM's generated prose. For AI features, test the deterministic plumbing around the model — retrieval, routing, tool-invocation, persistence, scoping — and mock the model with fixed responses.
 
@@ -32,7 +32,7 @@ Each `[TDD]` task in `plan.md` carries a criterion ID and a `Then` to assert. Wo
 - **No implementation before a failing test.** If you find behavioral code written without a preceding red test, delete it and restart the cycle for that behavior. Code that never had a failing test has never been proven.
 - **One behavior per test.** No hidden `and` combining two assertions — that's two tasks.
 - **Critical criteria come in allow/deny pairs.** For every security or money boundary, both the success case and its violation must have passing tests (e.g. valid login succeeds *and* no-session is rejected). A green happy-path with no deny test is not done.
-- **Never weaken a test to make it pass.** If a test is hard to satisfy, fix the code, not the test. Weakening the test destroys the only signal that matters. When stuck, hand off to `systematic-debugging`.
+- **Never weaken a test to make it pass.** If a test is hard to satisfy, fix the code, not the test. Weakening the test destroys the only signal that matters. When stuck, hand off to `project-kickoff:systematic-debugging`.
 
 ## Definition of done for a task
 

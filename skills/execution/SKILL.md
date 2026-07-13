@@ -1,6 +1,6 @@
 ---
 name: execution
-description: Build the project by working an approved implementation plan, delegating testing and verification to their dedicated skills. Use this skill after plan.md exists and the user is ready to generate the actual project. It works tasks top to bottom, installs dependencies, and drives the build to a verified, complete state. It calls test-driven-development for behavioral tasks, verification-before-completion for the definition of done, and systematic-debugging when the gate is red. Trigger when plan.md exists and it's time to build.
+description: Build the project by working an approved implementation plan, delegating testing and verification to their dedicated skills. Use this skill after plan.md exists and the user is ready to generate the actual project. It works tasks top to bottom, installs dependencies, and drives the build to a verified, complete state. It calls project-kickoff:test-driven-development for behavioral tasks, project-kickoff:verification-before-completion for the definition of done, and project-kickoff:systematic-debugging when the gate is red. Trigger when a plan.md produced by this project-kickoff chain exists (alongside its kickoff spec.md) and it's time to build. Do not trigger for plan files in an established codebase that this chain did not generate.
 ---
 
 # Execution
@@ -21,9 +21,9 @@ This is the final stage of: **questionnaire -> [design-import, when a design sou
 
 Go top to bottom. The plan is ordered to keep the app bootable and to front-load risk; don't reorder.
 
-**For each `[STRUCT]` task:** create what it names (scaffold — named from the spec's Product line — connection, config, dependency), confirm its done-line, move on. Do not test-drive these — `verification-before-completion` presence-checks them.
+**For each `[STRUCT]` task:** create what it names (scaffold — named from the spec's Product line — connection, config, dependency), confirm its done-line, move on. Do not test-drive these — `project-kickoff:verification-before-completion` presence-checks them.
 
-**For each `[TDD]` task:** hand off to the `test-driven-development` skill and run its full red-green cycle — failing test first, then minimal code, then green. Do not implement behavioral code any other way.
+**For each `[TDD]` task:** hand off to the `project-kickoff:test-driven-development` skill and run its full red-green cycle — failing test first, then minimal code, then green. Do not implement behavioral code any other way.
 
 **Record progress as you go.** Flip the task's checkbox in plan.md to `[x]` in the same commit as the task's work (for `[TDD]` tasks, the commit the TDD cycle already makes). A plan whose checkboxes match reality is what makes an interrupted build resumable.
 
@@ -33,7 +33,7 @@ Go top to bottom. The plan is ordered to keep the app bootable and to front-load
 
 **Dependencies:** install as tasks require them. Choose current, compatible versions and let the lockfile pin them — copy resolved versions into the lockfile rather than leaving them floating. When a task needs a package, add it; don't defer.
 
-**The verify script:** early, right after the foundation `[STRUCT]` tasks, have `verification-before-completion` write the self-contained verify script into the project — and run it twice in a row to confirm it terminates cleanly and leaves no process behind.
+**The verify script:** early, right after the foundation `[STRUCT]` tasks, have `project-kickoff:verification-before-completion` write the self-contained verify script into the project — and run it twice in a row to confirm it terminates cleanly and leaves no process behind.
 
 **Gate cadence.** Per task, run only the task's own check — the `[TDD]` cycle's own test, or the `[STRUCT]` done-line. The full verify gate runs at exactly three milestones: right after the verify script is written (green baseline), after the critical security-and-money `[TDD]` block, and at finish. Never substitute a full gate for a per-task check or vice versa: per-task full gates multiply a 30-task build's wall-clock by the cost of install+build+boot, and skipped milestones let regressions hide until the end.
 
@@ -41,7 +41,7 @@ Go top to bottom. The plan is ordered to keep the app bootable and to front-load
 
 When every task is worked:
 
-1. **Verify.** Hand off to `verification-before-completion`. It runs the gate (install, typecheck, build, test, boot) and the completeness check (every spec-promised module present, every critical allow/deny pair green). If the gate is red, hand off to `systematic-debugging`, fix the root cause, and re-run — within the loop ceiling. The build is not done until both halves pass.
+1. **Verify.** Hand off to `project-kickoff:verification-before-completion`. It runs the gate (install, typecheck, build, test, boot) and the completeness check (every spec-promised module present, every critical allow/deny pair green). If the gate is red, hand off to `project-kickoff:systematic-debugging`, fix the root cause, and re-run — within the loop ceiling. The build is not done until both halves pass.
 
 2. **Document.** After the project exists and verifies, run `/init` (or write the equivalent) so the generated `CLAUDE.md`/`AGENTS.md` describes the real, finished codebase for whoever works on it next. `/init` is a finishing step — it documents what was built, it never guides the build.
 
