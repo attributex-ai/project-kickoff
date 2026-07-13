@@ -18,13 +18,23 @@ Do both as you go. A questionnaire that just reads ten fields aloud adds nothing
 
 ---
 
+## Harvest the brief first
+
+Before asking anything, parse what the person already said when they invoked the chain. "Build me a multi-tenant invoicing SaaS with Stripe on Vercel" already answers project type, multi-tenant, payments, and deployment. Pre-fill every field the brief answers, and present each inferred value **explicitly marked as inferred** for confirmation in the relevant turn — never silently assume. Re-asking what the person just told you is the form-filling this skill exists to avoid.
+
+---
+
 ## The questions, and how they branch
 
 Ask in this order. Each entry says what to ask, and when to skip.
 
-**1. Project type** *(always ask, first)*
+**1. Project type & product** *(always confirm, first — solo, since it drives all pruning)*
 One of: Marketing Website, SaaS, Internal Business Dashboard, Client Portal, Marketplace, Learning Management System, AI Application, E-commerce, Booking System, Community Platform, Mobile App, Other.
 This answer drives all pruning below. If **Other**, ask a follow-up to map it onto the closest known shape, then branch as that shape.
+In the same turn, capture the product identity: *"In one line — what does it do, and for whom? And a working name, or 'unnamed'?"* Pre-fill both from the brief; accept "unnamed" so this never blocks. The one-liner is what the spec's Summary and core-flow criteria are written from; the name is what the repo and package are scaffolded as.
+
+**1b. Stack** *(ask with the first batch; one recommended default per type, free-text override)*
+Web-shaped types (SaaS, Marketing Website, Dashboard, Portal, Marketplace, LMS, E-commerce, Booking, Community, AI Application): **Next.js (recommended)** or another framework they name. Mobile App: **Expo/React Native (recommended)** or Flutter. Headless/API-only: **Node/TypeScript (recommended)** or Python. Frameworks only — never versions; versions are chosen at execution and pinned by the lockfile.
 
 **2. Authentication required?** *(Y/N)*
 Skip and default to **Yes** when the type inherently needs accounts: SaaS, Client Portal, Marketplace, LMS, Community Platform, Booking System, most E-commerce. Only genuinely ask for Marketing Website and simple AI Applications, where it's a real choice.
@@ -48,12 +58,25 @@ Always offer. Default to **none** unless the type is AI Application (then ask wh
 Skip for Mobile App type (it *is* the app — instead ask the reverse: is there a web companion?). Ask elsewhere only where a second client is plausible.
 
 **9. Deployment target** *(Vercel / AWS / Azure / GCP)*
-Always ask. Default suggestion by stack (e.g. Vercel for Next.js web), but let them choose.
+Always ask. Derive the default from the chosen stack (e.g. Vercel for Next.js), but let them choose.
 
 **10. Design source** *(Claude Design / describe in words / none)*
 Ask whenever the project has any UI. Skip only for headless/API-only builds. Options: **Import from Claude Design** — capture the project URL or ID now; a later skill (`design-import`) pulls it. **Describe a visual direction** — capture the description in their words. **None** — default minimal styling. You do not fetch anything here: you capture the choice, and for Claude Design the URL/ID, nothing more.
 
 Keep each question short. Offer the enumerated options. Don't lecture. Move.
+
+---
+
+## Batch the round-trips
+
+Round-trips are the interview's dominant cost, and after project type the surviving questions are mutually independent — so batch them. When your harness offers a structured multi-question tool (AskUserQuestion in Claude Code), ask up to four per call; otherwise put the batch in a single message.
+
+- **Turn 1:** confirm the brief harvest and project type + product identity, solo — everything else prunes off this answer.
+- **Turn 2:** one batch of the surviving core questions — stack, auth, database, payments, multi-tenant — with the type-derived defaults pre-selected.
+- **Turn 3:** one batch of the survivors from the remainder — admin, AI features, mobile companion, deployment, design source.
+- **After each batch:** run the constraint pass below and resolve every violation, plus any dependent follow-ups (e.g. RAG → where vectors live, which depends on the database answer), in one consolidated turn.
+
+The rule: never ask one at a time when two or more independent questions remain. Pruning still applies inside a batch — a question that doesn't survive the project type is never asked, batched or not.
 
 ---
 
@@ -79,7 +102,9 @@ When the questions are answered and every constraint is resolved, produce a comp
 
 ```
 ## Captured answers
+- Product: <name or unnamed> — <one-line: what it does, for whom>
 - Project type: <type>
+- Stack: <framework choice>
 - Authentication: <yes/no>
 - Database: <choice or none>
 - Payments: <yes/no>
