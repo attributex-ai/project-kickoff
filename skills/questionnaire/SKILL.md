@@ -1,6 +1,6 @@
 ---
 name: questionnaire
-description: Run the dynamic project kickoff interview that starts a new project build. Use this skill the moment someone wants to scaffold, generate, or kick off a new project, or runs the /kickoff command, or says "start a new project," "spin up a project," or "build me a SaaS/dashboard/API." It asks a short, branching set of questions, prunes questions that don't apply, and rejects incoherent combinations before anything is built. It captures answers only; it does not write code. When it finishes it hands off to the spec-authoring skill. Trigger this before any spec, plan, or code generation for a new project.
+description: Run the dynamic project kickoff interview that starts a new project build. Use this skill the moment someone wants to scaffold, generate, or kick off a new project, or runs the /kickoff command, or says "start a new project," "spin up a project," or "build me a SaaS/dashboard/API." It asks a short, branching set of questions, prunes questions that don't apply, and rejects incoherent combinations before anything is built. It captures answers only; it does not write code. When it finishes it hands off to design-import when a design source was captured, otherwise to spec-authoring. Trigger this before any spec, plan, or code generation for a new project.
 ---
 
 # Project Kickoff Questionnaire
@@ -75,7 +75,7 @@ When you catch one, don't just error — propose the fix ("Payments usually need
 
 ## Handoff
 
-When the questions are answered and every constraint is resolved, produce a compact, unambiguous summary of the captured answers and pass control to the **spec-authoring** skill. Format the summary so the next skill can read it directly:
+When the questions are answered and every constraint is resolved, produce a compact, unambiguous summary of the captured answers and pass control to the next skill (routing below). Format the summary so the next skill can read it directly:
 
 ```
 ## Captured answers

@@ -7,7 +7,7 @@ description: Turn an approved project spec into an ordered, tagged implementatio
 
 You have an approved `spec.md` containing two lists: behavioral **criteria** (Given/When/Then) and structural **checks** (presence assertions). Your job is to turn them into an ordered task list that the execution skill works top to bottom. You write `plan.md`. You do not write code.
 
-This is link three of: **questionnaire → spec → plan (you are here) → execution.**
+This skill's place in the chain: **questionnaire → [design-import, when a design source was captured] → spec → plan (you are here) → execution.**
 
 The plan is where the behavioral/structural split stops being a table and becomes something the executor mechanically obeys. Every task carries a tag that tells the executor *how* to satisfy it — by going red-green, or by verifying presence. Get the tags and the order right and the build is honest. Get them wrong and TDD collapses back into ceremony.
 

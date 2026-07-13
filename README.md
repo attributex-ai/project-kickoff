@@ -7,7 +7,7 @@ A Claude Code plugin that scaffolds a new, self-verifying project through a stag
 An interview becomes a testable spec, the spec becomes a tagged plan, the plan becomes a build that proves every promised behavior with a test before it counts as done.
 
 **Chain** (each stage emits a committed artifact the next consumes):
-`questionnaire` -> `spec-authoring` -> `planning` -> `execution`
+`questionnaire` -> `design-import` *(conditional — runs only when a design source was captured)* -> `spec-authoring` -> `planning` -> `execution`
 
 **Disciplines** (enforced across the build):
 `test-driven-development` (red-green for every behavioral feature), `verification-before-completion` (done = green gate + every promised module present), `systematic-debugging` (structured recovery when the gate is red).
@@ -26,9 +26,10 @@ project-kickoff/
 ├── hooks/
 │   ├── hooks.json                # SessionStart wiring
 │   └── greenfield-nudge.sh       # suggests /kickoff only in near-empty dirs
-├── skills/                       # the eight skills — the actual product
+├── skills/                       # the nine skills — the actual product
 │   ├── using-project-kickoff/
 │   ├── questionnaire/
+│   ├── design-import/
 │   ├── spec-authoring/
 │   ├── planning/
 │   ├── test-driven-development/
@@ -41,7 +42,7 @@ project-kickoff/
 ├── CLAUDE.md                     # dev-facing (working ON the plugin)
 ├── LICENSE                       # MIT
 ├── package.json
-├── PRD.md                        # build spec + audit history
+├── PRD.md                        # historical build spec (pre design-import) + audit history
 └── README.md
 ```
 
@@ -67,7 +68,7 @@ Then, in an empty directory, either wait for the session-start nudge or run (plu
 /project-kickoff:kickoff        # or just /kickoff
 ```
 
-Suggested first test input: SaaS, auth yes, Postgres, payments yes, multi-tenant yes, admin yes, no AI, no mobile, Vercel. Stop after `spec.md` and `plan.md` are produced and confirm the spine works before letting execution run.
+Suggested first test input: SaaS, auth yes, Postgres, payments yes, multi-tenant yes, admin yes, no AI, no mobile, Vercel, design source none. Stop after `spec.md` and `plan.md` are produced and confirm the spine works before letting execution run. (Answering the design question with a described direction instead exercises the conditional `design-import` stage.)
 
 ## Distribute
 

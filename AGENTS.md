@@ -1,6 +1,6 @@
 # AGENTS.md — using project-kickoff on non-Claude harnesses
 
-This repository is packaged as a Claude Code plugin (see README). The skill instructions under `skills/` are harness-neutral — they contain no Claude-specific logic — so other coding agents can consume them directly.
+This repository is packaged as a Claude Code plugin (see README). The skill instructions under `skills/` are harness-neutral except where noted below, so other coding agents can consume them directly.
 
 ## Harnesses with their own plugin systems
 
@@ -12,7 +12,7 @@ If your agent has no plugin install for this, run the chain by following the ski
 
 1. `skills/using-project-kickoff/SKILL.md` — orientation and when to start
 2. `skills/questionnaire/SKILL.md` — the dynamic interview
-3. `skills/design-import/SKILL.md` — *(only when the questionnaire captured a design source)* pulls the design into standalone project files plus a manifest the spec consumes; skipped for source "none"
+3. `skills/design-import/SKILL.md` — *(only when the questionnaire captured a design source)* pulls the design into standalone project files plus a manifest the spec consumes; skipped for source "none". Note: the `claude-design` source is read with Claude Code's DesignSync tool; on other harnesses, treat a claude-design source as a described direction (the skill's lighter path) or proceed with source "none", recording the change.
 4. `skills/spec-authoring/SKILL.md` — answers into a testable `spec.md`
 5. `skills/planning/SKILL.md` — `spec.md` into a tagged `plan.md`
 6. `skills/execution/SKILL.md` — build the plan, which invokes:
@@ -20,4 +20,4 @@ If your agent has no plugin install for this, run the chain by following the ski
    - `skills/verification-before-completion/SKILL.md`
    - `skills/systematic-debugging/SKILL.md`
 
-Only the generated artifacts (`spec.md`, `plan.md`, code, tests, verify script) land in the project. Nothing from this repository is copied into the generated project, and the generated project must run without it.
+Only the generated artifacts (`spec.md`, `plan.md`, code, tests, verify script — and, when a design was imported, `design/DESIGN.md` plus the materialized tokens, fonts, and brand assets) land in the project. Nothing from this repository is copied into the generated project, and the generated project must run without it.

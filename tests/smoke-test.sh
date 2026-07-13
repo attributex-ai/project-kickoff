@@ -40,6 +40,12 @@ while IFS= read -r f; do
   check "$(basename "$(dirname "$f")") frontmatter has description" "grep -q '^description:' '$f'"
 done < <(find "$root/skills" -name SKILL.md)
 
+# Chain-drift guard: every restatement of the chain must include the conditional
+# design-import link (this drifted once; see feature/performance-improvements).
+for f in README.md skills/spec-authoring/SKILL.md skills/planning/SKILL.md skills/execution/SKILL.md; do
+  check "$f chain line mentions design-import" "grep -q 'design-import' '$root/$f'"
+done
+
 echo
 if [ "$fail" -eq 0 ]; then echo "ALL CHECKS PASSED"; else echo "SOME CHECKS FAILED"; fi
 exit $fail

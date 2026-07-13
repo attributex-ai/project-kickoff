@@ -1,13 +1,13 @@
 ---
 name: spec-authoring
-description: Turn a completed project questionnaire into a testable specification. Use this skill immediately after the project questionnaire finishes and answers have been captured, before any planning or code generation. It runs a short chunked interview to deepen the behavioral answers, then emits a spec of Given/When/Then acceptance criteria plus structural presence checks. Trigger whenever you have questionnaire answers and need a spec, whenever someone asks to "write the spec," "turn answers into criteria," or "prepare acceptance criteria," and whenever the next step in a project-kickoff chain is specification. Do not skip straight to planning or building from raw questionnaire answers; they are too thin to test against.
+description: Turn a completed project questionnaire into a testable specification. Use this skill immediately after the project questionnaire finishes — or after design-import, when a design source was captured — before any planning or code generation. It runs a short chunked interview to deepen the behavioral answers, then emits a spec of Given/When/Then acceptance criteria plus structural presence checks. Trigger whenever you have questionnaire answers and need a spec, whenever someone asks to "write the spec," "turn answers into criteria," or "prepare acceptance criteria," and whenever the next step in a project-kickoff chain is specification. Do not skip straight to planning or building from raw questionnaire answers; they are too thin to test against.
 ---
 
 # Spec Authoring
 
 You have a set of questionnaire answers describing a project to build. Nine or so answers are far too thin to build a correct project from, and they are far too thin to *test* a project against. Your job is to turn them into a specification precise enough that every promised behavior maps to a test written before the code exists.
 
-This skill is the second link in the kickoff chain: **questionnaire → spec (you are here) → plan → execution**. You produce the artifact the plan is decomposed from. If your spec is vague, every test downstream is confident and wrong. Precision here is the whole point.
+This skill's place in the kickoff chain: **questionnaire → [design-import, when a design source was captured] → spec (you are here) → plan → execution**. You produce the artifact the plan is decomposed from. If your spec is vague, every test downstream is confident and wrong. Precision here is the whole point.
 
 The spec you emit has two parts:
 - **Criteria** — behavioral, written as Given/When/Then, one test each. These get test-driven (red before green).
@@ -65,6 +65,7 @@ Work one behavioral category per chunk:
 - RAG selected but no database → ask where vectors live; if there's genuinely no store, the combination is invalid, resolve it before proceeding.
 - Multi-tenant selected → auth criteria must become tenant-aware; every "user can access X" gains an implicit "user of tenant A cannot access tenant B's X."
 - Payments selected but no auth → who owns the entitlement? Resolve the ownership before writing payment criteria.
+- Design source captured (anything other than "none") → `design/DESIGN.md` must exist before any criterion is written. If it does not, design-import was skipped — stop and invoke it first; do not spec a design that was never imported.
 - Design imported → the reconciliation is already done (the `design-import` skill resolved identity, copy, screens-in-scope, and source-of-truth conflicts with the user). Read `design/DESIGN.md` and turn its component inventory and token/font/asset entries into structural checks — one per named component, plus the token/fonts/theme-applied checks. Do not re-litigate the design; do encode what the manifest promises so it can't silently vanish from the build.
 
 Chunking matters because a person can actually read and correct four criteria at a time. They cannot meaningfully approve forty at once. The sign-off per chunk is what makes the eventual tests trustworthy, because a human confirmed each behavior is the intended one.
@@ -183,6 +184,7 @@ A format is only enforced if you refuse to emit anything that violates it. Befor
 - If it touches an LLM, payment, or third-party API: is `Mocked` filled?
 - Does every behavioral category the questionnaire selected have at least one criterion?
 - Does every structural category have at least one check?
+- If the captured answers record a design source other than "none": does `design/DESIGN.md` exist? If not, stop — invoke `design-import` before emitting the spec.
 - If a design was imported: does the spec include structural checks for the token file (present + globally imported), fonts, each named component in the manifest, brand assets, and the app rendering with the theme applied?
 
 If a criterion can't be made to pass this gate, the underlying answer is still too vague — go back to the interview for that one category rather than emitting a criterion no honest test can be written from. This refusal is the point. It is the same move brainstorming makes when it won't proceed on a fuzzy design.

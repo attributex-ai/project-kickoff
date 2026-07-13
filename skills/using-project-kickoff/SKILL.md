@@ -1,6 +1,6 @@
 ---
 name: using-project-kickoff
-description: Orient to the project-kickoff chain and know when to start it. Use this skill at the start of any session where the user signals they want to build, scaffold, spin up, or generate a new project or app, or when a directory is empty and a new build is plausible. It explains the four-stage chain and the disciplines that run across it, and points at the entry skill. It does not build anything itself; it makes sure the right skill fires at the right time.
+description: Orient to the project-kickoff chain and know when to start it. Use this skill at the start of any session where the user signals they want to build, scaffold, spin up, or generate a new project or app, or when a directory is empty and a new build is plausible. It explains the four-stage chain plus its conditional design-import stage, the disciplines that run across it, and points at the entry skill. It does not build anything itself; it makes sure the right skill fires at the right time.
 ---
 
 # Using Project Kickoff

@@ -36,7 +36,7 @@ No project to pull. The person described a visual direction in words. Produce a 
 
 Use the **DesignSync** tool's read methods, in this order. It reads through the user's claude.ai login.
 
-1. **Authorize if needed.** The first read may report that design-system access isn't granted. If so, tell the user to run `/design-login`, then retry. If they can't or won't authorize, do not stall the build — offer to fall back to a **described** direction or to **none**, and record the change.
+1. **Authorize if needed.** The first read may report that design-system access isn't granted. If so, tell the user to run `/design-login`, then retry. If they can't or won't authorize, or the DesignSync tool is not available in this harness, do not stall the build — offer to fall back to a **described** direction or to **none**, and record the change.
 2. **`get_project`** — confirm the target exists, the user can read it, and its `type` is `PROJECT_TYPE_DESIGN_SYSTEM`. A regular project is not a design system; stop and confirm the URL/ID with the user.
 3. **`list_files`** — build a structural picture from paths alone. Look for: a token source of truth (a `*tokens*.css` / `colors*.css` / `*tokens*.json`), a `fonts/` directory, brand assets (`assets/`, logo SVGs), a written system (`design-system.md`, `README.md`), and component previews (`preview/*`, `ui_kits/*`).
 4. **`get_file`** — read only what you need to build the manifest and the materialized files: the token file, the written system, and enough of the component previews to inventory them. Do not slurp every preview; the previews are reference, not code you copy verbatim.

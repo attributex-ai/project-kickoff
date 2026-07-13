@@ -1,5 +1,7 @@
 # Project Kickoff — Complete & Submit Implementation Plan
 
+> **Status: historical (completed).** This plan was executed in July 2026, before the `design-import` skill existed. Do not execute it; it is kept as audit history.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Take the already-assembled project-kickoff plugin from "validates locally with one failing check" to "published on GitHub and submitted to Anthropic's community plugin marketplace."

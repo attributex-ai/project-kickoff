@@ -1,5 +1,7 @@
 # PRD: Project Kickoff Plugin (v3 — superpowers re-audit)
 
+> **Status: historical.** This is the v3 build spec, written before the `design-import` skill existed (the plugin now has nine skills, not eight). Do not execute it; it is kept as audit history. The current source of truth for structure is README.md and CLAUDE.md.
+
 ## Purpose of this version
 
 v2 aligned the plugin to Anthropic's Claude Code plugin docs. v3 re-audits against the **actual superpowers repository** (obra/superpowers, read live) and folds in the structural patterns that repo proves in production. It also **corrects an error I made in v2**. Changes are tagged **[FIX]** (correcting a mistake) or **[ENHANCE]** (adopting a superpowers pattern).

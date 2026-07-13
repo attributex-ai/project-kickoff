@@ -7,7 +7,7 @@ description: Build the project by working an approved implementation plan, deleg
 
 You have an approved `plan.md`: an ordered list of `[TDD]` and `[STRUCT]` tasks, each carrying an ID that traces to the spec. Build the project by working that list, and leave behind a project that verifies itself and stands entirely on its own.
 
-This is the final stage: **questionnaire -> spec -> plan -> execution.** It orchestrates; the disciplines do the enforcing.
+This is the final stage of: **questionnaire -> [design-import, when a design source was captured] -> spec -> plan -> execution.** It orchestrates; the disciplines do the enforcing.
 
 ## Two principles that govern everything
 
@@ -39,7 +39,7 @@ When every task is worked:
 
 3. **Provenance.** Write into the generated README that the project was produced from the committed `spec.md` and `plan.md`, and that `verify` is the source of truth for "is it working."
 
-4. **Confirm the standalone rule.** Nothing in the generated project references or imports the plugin. Spec, plan, tests, verify script, and code are all self-contained and committed.
+4. **Confirm the standalone rule.** Nothing in the generated project references or imports the plugin. Spec, plan, tests, verify script, and code — and, when a design was imported, design/DESIGN.md plus the materialized tokens, fonts, and brand assets — are all self-contained and committed.
 
 5. **Report** what was built, the verify result, and the completeness result, in the user's terms.
 

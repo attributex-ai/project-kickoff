@@ -15,4 +15,4 @@ Invoke the `questionnaire` skill to interview the user about what they want to b
    - `verification-before-completion` as the definition of done, and
    - `systematic-debugging` whenever the verify gate goes red.
 
-Do not skip stages. Each produces a committed artifact the next consumes. Only the generated artifacts (spec.md, plan.md, the code, the tests, and the verify script) belong in the project. None of this plugin's own files are copied into the generated project.
+Do not skip stages. Each produces a committed artifact the next consumes. Only the generated artifacts (spec.md, plan.md, the code, the tests, the verify script — and, when a design was imported, design/DESIGN.md plus the materialized tokens, fonts, and brand assets) belong in the project. None of this plugin's own files are copied into the generated project.
