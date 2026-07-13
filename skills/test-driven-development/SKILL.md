@@ -20,7 +20,7 @@ Never test an LLM's generated prose. For AI features, test the deterministic plu
 Each `[TDD]` task in `plan.md` carries a criterion ID and a `Then` to assert. Work it in this exact order:
 
 1. **Stand up mocks/fixtures** the task names (or confirm the shared harness is in place). Payment tests use test-mode signed webhooks and faked charges, never a live API. AI tests use a stubbed model client.
-2. **RED — write the test** that asserts exactly the criterion's `Then`. One behavior, one test.
+2. **RED — write the test** that asserts exactly the criterion's `Then`. One behavior, one test. Title it with the criterion ID ("auth-001: no session → 401") so a red test names its spec line and completeness can be checked by ID.
 3. **Run it. Watch it fail** — and fail for the *right reason* (the behavior is missing, not the test is malformed). A test that passes before you implement is broken; fix the test.
 4. **GREEN — write the minimal code** that makes the test pass. No more than the test demands. Resist building ahead of the test (YAGNI).
 5. **Run it. Watch it pass.**

@@ -13,11 +13,13 @@ Early in the build (right after the foundation `[STRUCT]` tasks), generate a **s
 
 The script runs, in order, failing loudly on the first failure:
 
+0. **Env preflight** — every variable named in `.env.example` is present; fail fast, naming each missing variable.
 1. **Install** — dependencies install cleanly from the lockfile.
 2. **Typecheck** — no type errors.
-3. **Build** — the production build succeeds.
-4. **Test** — the full suite passes (where every `[TDD]` test runs).
-5. **Boot** — the app starts and a health check responds.
+3. **Lint** — passes with the project's own config (the scaffold's default ruleset).
+4. **Build** — the production build succeeds.
+5. **Test** — the full suite passes (where every `[TDD]` test runs).
+6. **Boot** — the app starts and the spec-named health route (or root route) responds 200.
 
 Output must be legible: on failure, surface the real error (failing test name, stack trace), not a truncated summary. You and the user will read it later.
 
@@ -33,7 +35,7 @@ A green verify proves **correctness**. It does not prove **completeness** — th
 - Every behavioral category in the spec has at least one passing `[TDD]` test.
 - Every `critical` criterion has **both** members of its allow/deny pair passing.
 - Every structural category has its `[STRUCT]` check satisfied.
-- Every module the questionnaire selected is physically present and wired.
+- Every module listed under Selected modules in `spec.md` is physically present and wired.
 - If a design was imported: the token file is present and globally imported, fonts load, every component named in `design/DESIGN.md` is present, brand assets are present, and the app renders with the theme applied rather than default browser styles. A build that compiles with unstyled placeholder pages is **not** complete.
 
 If anything the spec promised is missing, the build is **not done** — return to execution and build it. "Compiles and boots" is necessary, not sufficient.

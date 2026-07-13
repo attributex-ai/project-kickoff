@@ -75,7 +75,7 @@ Run all four checks first, then present every mismatch in **one consolidated dec
 
 ## Emit the design manifest
 
-Write `design/DESIGN.md` into the project root (a permanent, standalone artifact, in the same category as `spec.md`). It is what spec-authoring reads to emit design checks and what planning orders. Structure:
+Write `design/DESIGN.md` into the project root (a permanent, standalone artifact, in the same category as `spec.md`). If the project directory is not already a git repository, run `git init` and write a minimal `.gitignore` (`.env*`, dependency dirs, build output) before committing it — never re-init or rewrite existing history. It is what spec-authoring reads to emit design checks and what planning orders. Structure:
 
 ```markdown
 # Design Manifest

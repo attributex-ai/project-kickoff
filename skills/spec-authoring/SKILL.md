@@ -32,9 +32,11 @@ The organizing rule, so you can classify anything not in the table below:
 
 | Questionnaire category | Behavioral (Criteria, TDD) | Structural (Checks, presence) |
 |---|---|---|
-| Project type | the core product flows (the `core-*` chunk, from the Product line) | scaffold in the chosen stack builds & boots |
+| Project type | the core product flows (the `core-*` chunk, from the Product line) | scaffold in the chosen stack builds & boots; a health endpoint (API) or root route (UI) responds 200; lint passes with the project's own config (the scaffold's default ruleset — never a plugin-supplied one) |
+| Repository & env *(always)* | (none) | .gitignore excludes .env*, dependency dirs, build output; .env.example enumerates every required env var with placeholder values |
+| UI baseline *(any UI, incl. design source none)* | (none) | viewport meta present; a global stylesheet exists and is imported into the app shell |
 | Authentication | all flows: 401s, session set, expiry, logout, redirects | SDK + env present |
-| Database | data rules & invariants, query scoping | connection, migrations, declared schema present |
+| Database | data rules & invariants, query scoping | connection, migrations, declared schema present; a documented local-dev DB path (compose file or provider CLI, named in the README) and a dev-only seed script creating minimum runnable state (a login-able user when auth is selected; a tenant + admin user when those are) |
 | Payments | charge, webhook→entitlement, **unsigned/invalid webhook→rejected, entitlement unchanged**, refund→revoke | SDK, webhook endpoint, keys present |
 | Multi-tenant | **cross-tenant denial** (highest priority) | tenant_id plumbing present |
 | Admin portal | authorization boundary (who is allowed) | pages render & reachable |
@@ -44,7 +46,7 @@ The organizing rule, so you can classify anything not in the table below:
 | AI: voice | (little to none) | endpoints wired |
 | Mobile companion | the API contract it consumes | app builds & launches |
 | Deployment target | (none) | config valid, target build succeeds |
-| Design / UI (if imported) | a11y only: visible focus, AA contrast on core text | token file present & globally imported, fonts load, each named component present & renders, brand assets present, app renders with the theme applied |
+| Design / UI (if imported) | a11y: behavioral only if a deterministic checker (e.g. axe-core) is wired; otherwise a presence/render check (visible focus, AA contrast on core text) | token file present & globally imported, fonts load, each named component present & renders, brand assets present, app renders with the theme applied |
 
 Note the split categories. Database, admin, and each AI sub-type land in **both** columns: the plumbing is a Check, the rule on top of it is a Criterion. Don't force a whole category into one bucket.
 
@@ -62,6 +64,8 @@ Work one chunk at a time, **propose-first**:
 1. State what you're about to pin down ("Let's nail the auth behavior.").
 2. Draft the chunk's criteria (at most four) yourself, from the boundary table and the captured answers, driving toward observable outcomes: status codes, redirects, what's in the DB after, what's denied. Flag every assumption inline ("assumed httpOnly session cookie — correct?").
 3. Present the draft plus the genuinely open parameters in one turn, and get a yes — approve or amend — before moving on. Drafting first and asking second costs the person one read instead of two round-trips per category.
+
+While drafting, include one malformed-input criterion (400/422 on a bad payload) for each core write endpoint, at `standard` priority — hardening flows through the same chunked sign-off as everything else instead of being silently emitted or silently omitted.
 
 **Enforce the constraints as you go.** The questionnaire may have produced an incoherent combination. Catch it here, conversationally:
 - RAG selected but no database → ask where vectors live; if there's genuinely no store, the combination is invalid, resolve it before proceeding.
@@ -183,6 +187,8 @@ Type:    presence
 Check:   app boots with a live DB connection and all declared schema tables exist
 ```
 
+Two safety rules for the always-on checks: `.env.example` carries placeholder values only, never live secrets; the seed script must be unmistakably dev-only.
+
 ---
 
 ## Self-check before emitting (this is what makes the format real)
@@ -196,6 +202,7 @@ A format is only enforced if you refuse to emit anything that violates it. Befor
 - Does every behavioral category the questionnaire selected have at least one criterion?
 - Does the spec contain at least one criterion for the product's core flow (`core-*`), not only module plumbing? If the build is genuinely flow-less (a static marketing site), is that recorded explicitly under Open questions?
 - Does every structural category have at least one check?
+- Are the always-on checks present: .gitignore, .env.example (placeholders only), the health/root route, lint with the project's own config — and, for any UI, the viewport meta + global stylesheet baseline?
 - If the captured answers record a design source other than "none": does `design/DESIGN.md` exist? If not, stop — invoke `design-import` before emitting the spec.
 - If a design was imported: does the spec include structural checks for the token file (present + globally imported), fonts, each named component in the manifest, brand assets, and the app rendering with the theme applied?
 
@@ -207,7 +214,7 @@ If a criterion can't be made to pass this gate, the underlying answer is still t
 
 Persist as you go, not only at the end — the interview is the chain's largest window of unrecoverable user investment:
 
-- **On receiving the handoff, before the first chunk:** write and commit a skeleton `spec.md` containing the Summary, the complete `## Selected modules` list (this durably captures the questionnaire answers, including the design source), and a `Status: draft` header.
+- **On receiving the handoff, before the first chunk:** write and commit a skeleton `spec.md` containing the Summary, the complete `## Selected modules` list (this durably captures the questionnaire answers, including the design source), and a `Status: draft` header. If the project directory is not already a git repository, run `git init` and write a minimal `.gitignore` (`.env*`, dependency dirs, build output) before this first commit — never re-init or rewrite existing history, and when a scaffold tool later writes its own `.gitignore`, merge, don't clobber.
 - **After each chunk's sign-off:** append that chunk's criteria and checks, and commit.
 - **At final sign-off:** flip the header to `Status: approved`. Any post-sign-off revision increments `Version` and requires re-sign-off.
 

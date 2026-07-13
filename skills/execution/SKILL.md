@@ -43,7 +43,7 @@ When every task is worked:
 
 2. **Document.** After the project exists and verifies, run `/init` (or write the equivalent) so the generated `CLAUDE.md`/`AGENTS.md` describes the real, finished codebase for whoever works on it next. `/init` is a finishing step — it documents what was built, it never guides the build.
 
-3. **Provenance.** Write into the generated README that the project was produced from the committed `spec.md` and `plan.md`, and that `verify` is the source of truth for "is it working."
+3. **Document for a fresh clone.** The generated README gets: what the product is (the Product line), prerequisites, env setup (copy `.env.example` and fill it in), DB start/migrate/seed commands, and run/test/`verify` commands — then the provenance note: produced from the committed `spec.md` and `plan.md`, with `verify` as the source of truth for "is it working."
 
 4. **Confirm the standalone rule.** Nothing in the generated project references or imports the plugin. Spec, plan, tests, verify script, and code — and, when a design was imported, design/DESIGN.md plus the materialized tokens, fonts, and brand assets — are all self-contained and committed.
 
