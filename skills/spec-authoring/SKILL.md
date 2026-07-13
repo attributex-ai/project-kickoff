@@ -67,8 +67,7 @@ Work one chunk at a time, **propose-first**:
 
 While drafting, include one malformed-input criterion (400/422 on a bad payload) for each core write endpoint, at `standard` priority — hardening flows through the same chunked sign-off as everything else instead of being silently emitted or silently omitted.
 
-**Enforce the constraints as you go.** The questionnaire may have produced an incoherent combination. Catch it here, conversationally:
-- RAG selected but no database → ask where vectors live; if there's genuinely no store, the combination is invalid, resolve it before proceeding.
+**Enforce the constraints as you go.** The questionnaire may have produced an incoherent combination — re-verify that the questionnaire skill's constraint list still holds, and resolve violations conversationally. The ones that shape criteria directly:
 - Multi-tenant selected → auth criteria must become tenant-aware; every "user can access X" gains an implicit "user of tenant A cannot access tenant B's X."
 - Payments selected but no auth → who owns the entitlement? Resolve the ownership before writing payment criteria.
 - Design source captured (anything other than "none") → `design/DESIGN.md` must exist before any criterion is written. If it does not, design-import was skipped — stop and invoke it first; do not spec a design that was never imported.
@@ -91,6 +90,7 @@ When:      <the single action taken>
 Then:      <the observable, assertable result>
 Fixture:   <test data/state that must exist>   (optional)
 Mocked:    <external deps stubbed>              (required when it touches an LLM, payment, or 3rd-party API)
+Pair:      <ID of the allow/deny partner>       (required when Priority: critical)
 ```
 
 Five rules govern what may be emitted. They are not style preferences; each one prevents a specific downstream failure.
@@ -99,7 +99,7 @@ Five rules govern what may be emitted. They are not style preferences; each one 
 
 **2. One criterion, one behavior.** No `and` in the `Then` hiding two assertions. "Returns 401 and logs the attempt" is two criteria. Atomic criteria mean a red test names exactly one broken behavior.
 
-**3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it. For payments the deny is webhook authenticity: a webhook that fails signature verification is rejected and changes no entitlement — an endpoint that trusts unsigned events hands out entitlements to anyone who can POST to it.
+**3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it. Record the partnership in each half's `Pair:` field so planning and verification can check pair coverage mechanically. For payments the deny is webhook authenticity: a webhook that fails signature verification is rejected and changes no entitlement — an endpoint that trusts unsigned events hands out entitlements to anyone who can POST to it.
 
 **4. `Mocked` is mandatory whenever an external dependency appears.** Payments name the stub (test-mode signed webhook, faked charge). AI names the mocked model response. Any third-party API names its stub. A criterion that touches Stripe or an LLM with a blank `Mocked` field is malformed. This forces the test-isolation decision into the spec instead of leaving the agent to improvise it (or hit a live API) mid-build.
 
@@ -114,6 +114,7 @@ Priority: critical
 Given:    no active session
 When:     GET /api/projects
 Then:     response status is 401
+Pair:     auth-002
 ```
 ```
 ID:       auth-002
@@ -122,6 +123,7 @@ Priority: critical
 Given:    a valid user credential
 When:     POST /api/login with that credential
 Then:     response sets an httpOnly session cookie
+Pair:     auth-001
 ```
 ```
 ID:       tenant-001
@@ -140,6 +142,7 @@ Given:    a checkout session for user U
 When:     a payment_succeeded webhook for that session is received
 Then:     user U's entitlement record is set to active
 Mocked:   Stripe webhook event (test-mode signed payload)
+Pair:     pay-005
 ```
 ```
 ID:       pay-005
@@ -149,6 +152,7 @@ Given:    a checkout session for user U
 When:     a payment_succeeded webhook with an invalid signature is received
 Then:     response status is 400 and user U's entitlement record is unchanged
 Mocked:   Stripe webhook event (mis-signed payload)
+Pair:     pay-004
 ```
 ```
 ID:       rag-002
@@ -197,7 +201,7 @@ A format is only enforced if you refuse to emit anything that violates it. Befor
 
 - Is the `Then` observable and binary? (No "secure/correct/properly.")
 - Is it exactly one behavior? (No hidden `and`.)
-- If `critical`: does it have its allow/deny partner?
+- If `critical`: does it have its allow/deny partner, recorded in both `Pair:` fields?
 - If it touches an LLM, payment, or third-party API: is `Mocked` filled?
 - Does every behavioral category the questionnaire selected have at least one criterion?
 - Does the spec contain at least one criterion for the product's core flow (`core-*`), not only module plumbing? If the build is genuinely flow-less (a static marketing site), is that recorded explicitly under Open questions?
@@ -206,7 +210,7 @@ A format is only enforced if you refuse to emit anything that violates it. Befor
 - If the captured answers record a design source other than "none": does `design/DESIGN.md` exist? If not, stop — invoke `design-import` before emitting the spec.
 - If a design was imported: does the spec include structural checks for the token file (present + globally imported), fonts, each named component in the manifest, brand assets, and the app rendering with the theme applied?
 
-If a criterion can't be made to pass this gate, the underlying answer is still too vague — go back to the interview for that one category rather than emitting a criterion no honest test can be written from. This refusal is the point. It is the same move brainstorming makes when it won't proceed on a fuzzy design.
+If a criterion can't be made to pass this gate, the underlying answer is still too vague — go back to the interview for that one category rather than emitting a criterion no honest test can be written from. This refusal is the point.
 
 ---
 
@@ -244,4 +248,4 @@ Version: 1
 
 `spec.md` is a permanent artifact. Commit it into the project. The plan skill decomposes it: each **criterion** becomes one `[TDD]` task (write failing test → implement → green), each **check** becomes one `[STRUCT]` task (present-and-boot). The `ID` is the join key that lets every task, test, and failure trace back to one line of this spec — so keep IDs stable and unique.
 
-Definition of done for the whole downstream build, stated in this spec's own terms: every criterion has a passing test, every `critical` criterion has both its allow and deny test passing, every check passes, and the app boots. Every noun in that sentence is something you emit here. That is why this skill is load-bearing.
+Definition of done for the whole downstream build, stated in this spec's own terms: every criterion has a passing test, every `critical` criterion has both its allow and deny test passing, every check passes, and the app boots.

@@ -5,11 +5,11 @@ description: Enforce true red-green test-driven development for every behavioral
 
 # Test-Driven Development
 
-TDD is the reliability mechanism for this whole system, not a stylistic preference. This plugin ships no golden reference and pins no versions, so the only thing tying generated behavior to correctness is a test that failed before the code existed and passed after. Red-then-green is mechanical proof. Skip it and "it works" degrades to "it looks like it works," which on a bad day is wrong and on camera.
+TDD is the reliability mechanism for this whole system, not a stylistic preference. This plugin ships no golden reference and pins no versions, so the only thing tying generated behavior to correctness is a test that failed before the code existed and passed after. Red-then-green is mechanical proof. Skip it and "it works" degrades to "it looks like it works."
 
 ## Scope: behavioral only
 
-Apply TDD to `[TDD]` tasks — behavior that could be wrong in a way a test catches: authentication flows, tenant isolation, payment/entitlement, admin authorization, data invariants, RAG retrieval mechanics, agent tool-routing. The behavioral/structural boundary is defined in the `spec-authoring` skill; follow it.
+Apply TDD to `[TDD]` tasks — behavior that could be wrong in a way a test catches: authentication flows, tenant isolation, payment/entitlement, admin authorization, data invariants, RAG retrieval mechanics, agent tool-routing. The plan's tags already encode the classification — obey the tag, never reclassify mid-build; a wrong-looking tag is a spec/plan gap: stop and flag it. The boundary itself is defined in the `spec-authoring` skill.
 
 Do **not** test-drive `[STRUCT]` tasks. Writing a red-green test for "tsconfig exists" or "the DB is connected" is theater. Those are handled by `verification-before-completion` as presence checks.
 

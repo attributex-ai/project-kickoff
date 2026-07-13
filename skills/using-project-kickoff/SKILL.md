@@ -5,7 +5,7 @@ description: Orient to the project-kickoff chain and know when to start it. Use 
 
 # Using Project Kickoff
 
-This plugin turns a rough "I want to build X" into a verified starter repository, through a staged chain with human checkpoints and enforced testing. Its whole reason for existing: an agent pointed at a blank directory will happily improvise a project that looks right and sometimes isn't. The chain replaces improvisation with a process you can watch and trust.
+This plugin turns a rough "I want to build X" into a verified starter repository, through a staged chain with human checkpoints and enforced testing. The chain replaces improvisation with a process you can watch and trust.
 
 ## When to start the chain
 

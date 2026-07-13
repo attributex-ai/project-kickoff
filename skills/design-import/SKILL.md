@@ -17,7 +17,7 @@ You import and normalize a design. You do not write criteria, plans, or feature 
 
 Two non-negotiables govern everything here, both inherited from the plugin's core discipline:
 
-- **Design is structural, never test-driven.** You are pulling tokens, fonts, assets, and component specs into the project. Nothing you import becomes a Given/When/Then. Asserting on a color, a spacing value, or a copy string is the same theater as asserting on generated prose. The spec will encode the design as **presence-and-render** checks; your output feeds those.
+- **Design is structural, never test-driven.** You are pulling tokens, fonts, assets, and component specs into the project. Nothing you import becomes a Given/When/Then. The spec will encode the design as **presence-and-render** checks; your output feeds those. (The boundary and its rationale are defined in the spec-authoring skill.)
 - **Everything you materialize stands alone.** Imported tokens, fonts, and brand assets become real files in the generated project. The project must build and run with this plugin uninstalled *and* with no runtime call to claude.ai/design. Self-host fonts; inline tokens; copy assets. Never leave the project depending on a remote design URL, and never reference the plugin.
 
 ---
@@ -112,6 +112,6 @@ Keep it factual and short. It is an index and a set of decisions, not a rewrite 
 
 ## Handoff
 
-When the design is staged, reconciled, and the manifest is written, hand off to **spec-authoring** with a one-line summary ("Design imported from `<source>`; manifest at `design/DESIGN.md`; N components inventoried; reconciliation resolved."). Spec-authoring will emit a design row of structural checks — token file present and globally imported, fonts load, each named component present and rendering, brand assets present, the app rendering with the theme applied — and, where accessibility is in scope, the thin behavioral slice (visible focus, AA contrast on core text).
+When the design is staged, reconciled, and the manifest is written, hand off to **spec-authoring** with a one-line summary ("Design imported from `<source>`; manifest at `design/DESIGN.md`; N components inventoried; reconciliation resolved."). Spec-authoring derives structural checks from each manifest section (tokens, fonts, components, assets, theme-applied) and, where accessibility is in scope, the a11y slice per the boundary rule it defines.
 
 You wrote exactly one artifact: `design/DESIGN.md`, plus the staged token/font/asset files under `design/`. You wrote no criteria, no plan, no feature code. The chain continues.
