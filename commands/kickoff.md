@@ -4,7 +4,7 @@ description: Start a new project. Runs the kickoff interview, then builds a veri
 
 Begin a new project kickoff.
 
-Invoke the `questionnaire` skill to interview the user about what they want to build, then follow the chain the skills define (each stage produces a committed artifact the next consumes):
+Invoke the `questionnaire` skill to interview the user about what they want to build, then follow the chain the skills define (each stage after the questionnaire produces a committed artifact the next consumes; the questionnaire hands off in-conversation and writes nothing):
 
 1. `questionnaire` — captured answers, including the design source
 2. `design-import` *(only when a design source was given)* — staged design files + `design/DESIGN.md`

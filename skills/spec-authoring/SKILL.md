@@ -97,7 +97,7 @@ Five rules govern what may be emitted. They are not style preferences; each one 
 
 **1. The `Then` must be observable and binary.** It asserts something a test can mechanically check: a status code, a row present or absent, a cookie set, a function called with given args. If a `Then` says "is secure," "works correctly," or "handles properly," it names a wish, not an assertion. A test can't fail against it, so it isn't a criterion.
 
-**2. One criterion, one behavior.** No `and` in the `Then` hiding two assertions. "Returns 401 and logs the attempt" is two criteria. Atomic criteria mean a red test names exactly one broken behavior.
+**2. One criterion, one behavior.** No `and` in the `Then` hiding two assertions. "Returns 401 and logs the attempt" is two criteria. Atomic criteria mean a red test names exactly one broken behavior. One deliberate exception: a deny criterion may assert the rejection plus the absence of the side effect it guards ("status is 400 and entitlement unchanged") — that is one behavior, the refusal, observed at two points.
 
 **3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it. Record the partnership in each half's `Pair:` field so planning and verification can check pair coverage mechanically. For payments the deny is webhook authenticity: a webhook that fails signature verification is rejected and changes no entitlement — an endpoint that trusts unsigned events hands out entitlements to anyone who can POST to it.
 
@@ -133,6 +133,7 @@ Given:    user U belongs to tenant A; resource R belongs to tenant B
 When:     U requests GET /api/resources/R
 Then:     response status is 403 and body contains no fields of R
 Fixture:  tenant A with user U; tenant B with resource R
+Pair:     tenant-002
 ```
 ```
 ID:       pay-004
@@ -200,7 +201,7 @@ Two safety rules for the always-on checks: `.env.example` carries placeholder va
 A format is only enforced if you refuse to emit anything that violates it. Before writing the spec file, run each criterion through this gate. Any failure means rewrite that criterion — do not emit it malformed.
 
 - Is the `Then` observable and binary? (No "secure/correct/properly.")
-- Is it exactly one behavior? (No hidden `and`.)
+- Is it exactly one behavior? (No hidden `and` — except a deny's rejection plus the absence of its guarded side effect.)
 - If `critical`: does it have its allow/deny partner, recorded in both `Pair:` fields?
 - If it touches an LLM, payment, or third-party API: is `Mocked` filled?
 - Does every behavioral category the questionnaire selected have at least one criterion?
@@ -246,6 +247,6 @@ Version: 1
 <anything the interview couldn't resolve; empty is good>
 ```
 
-`spec.md` is a permanent artifact. Commit it into the project. The plan skill decomposes it: each **criterion** becomes one `[TDD]` task (write failing test → implement → green), each **check** becomes one `[STRUCT]` task (present-and-boot). The `ID` is the join key that lets every task, test, and failure trace back to one line of this spec — so keep IDs stable and unique.
+`spec.md` is a permanent artifact. Commit it into the project. The plan skill decomposes it: each **criterion** becomes one `[TDD]` task (write failing test → implement → green), each **check** becomes one `[STRUCT]` task (presence-verified; boot re-checked only for boot-path tasks). The `ID` is the join key that lets every task, test, and failure trace back to one line of this spec — so keep IDs stable and unique.
 
 Definition of done for the whole downstream build, stated in this spec's own terms: every criterion has a passing test, every `critical` criterion has both its allow and deny test passing, every check passes, and the app boots.

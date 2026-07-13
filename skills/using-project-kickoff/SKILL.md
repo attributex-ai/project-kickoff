@@ -15,7 +15,7 @@ Do **not** start the chain for changes to an existing, populated codebase. This 
 
 ## The chain
 
-Four stages, plus one conditional. From spec-authoring on, every stage produces a committed artifact the next consumes; the questionnaire's capture becomes durable only when spec-authoring writes the skeleton `spec.md`.
+Four stages, plus one conditional. Every stage after the questionnaire produces a committed artifact the next consumes; the questionnaire itself writes nothing — its capture becomes durable when the next stage writes its first artifact (`design/DESIGN.md` on the design path, otherwise the skeleton `spec.md`).
 
 1. **`questionnaire`** — a dynamic, branching interview. Prunes questions that don't apply and rejects incoherent combinations. Captures answers — including the **design source** (a Claude Design project, a described direction, or none).
 2. **`design-import`** *(conditional — runs only when a design source was given)* — pulls the design from Claude Design (or a described direction), materializes tokens, fonts, brand assets, and a component inventory into the project as standalone files, reconciles it against the answers, and emits a `design/DESIGN.md` manifest the spec consumes. Skipped entirely when the design source is "none."
@@ -45,10 +45,11 @@ Detect the stage from the artifacts on disk, then enter there:
 | On disk | Resume at |
 |---|---|
 | no `spec.md`, no `design/` | `questionnaire` — nothing durable existed yet |
+| `design/DESIGN.md` present, no `spec.md` | `spec-authoring` — design-import is done, don't re-run it; re-confirm the questionnaire answers first (only the design source and reconciliation decisions survive in the manifest) |
 | `spec.md` with `Status: draft` | `spec-authoring` — resume the interview at the first category with no criteria |
 | `spec.md` approved, no `plan.md` | `planning` |
 | `plan.md` with unchecked tasks | `execution`'s resume procedure |
-| every task checked | `verification-before-completion` |
+| every task checked | `project-kickoff:verification-before-completion` |
 
 If `plan.md` carries a `## Verify status` block, read it before any debugging — it records what already failed. Consistency check: if spec.md's Selected modules names a design source but `design/DESIGN.md` is absent, design-import was skipped — run it before proceeding.
 

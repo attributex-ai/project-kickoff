@@ -28,7 +28,7 @@ Two non-negotiables govern everything here, both inherited from the plugin's cor
 A design-system project on claude.ai/design, read with the **DesignSync** tool. This is the rich path: real tokens, fonts, component specs, brand assets, and a written system.
 
 **2. Described direction** (source recorded as `described:"..."`).
-No project to pull. The person described a visual direction in words. Produce a lighter manifest from the description — a token intent (palette, type families, radius/spacing feel), a component list implied by the project type, and any brand notes. There is nothing to fetch; skip straight to "Emit the design manifest."
+No project to pull. The person described a visual direction in words. Produce a lighter manifest from the description — a token intent (palette, type families, radius/spacing feel), a component list implied by the project type, and any brand notes. There is nothing to fetch, but there is still something to stage: synthesize `design/tokens.css` from the described direction (recording the synthesis and its fidelity caveat under Reconciliation notes), and record fonts and brand assets as "none staged — out of scope" in the manifest so the spec and the completeness backstop skip those sections. Then go straight to "Emit the design manifest."
 
 ---
 

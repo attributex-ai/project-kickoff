@@ -9,8 +9,12 @@
 
 set +e
 
-# An in-progress kickoff leaves artifacts; nudge resume, not restart.
-if [ -f spec.md ] || [ -f plan.md ] || [ -f design/DESIGN.md ]; then
+# An in-progress kickoff leaves artifacts; nudge resume, not restart. Match on
+# the artifacts' template headers, not bare filenames — spec.md/plan.md are
+# common names in repos this plugin never touched, and those must stay silent.
+if { [ -f spec.md ] && grep -q '^# Project Specification' spec.md; } ||
+   { [ -f plan.md ] && grep -q '^# Implementation Plan' plan.md; } ||
+   { [ -f design/DESIGN.md ] && grep -q '^# Design Manifest' design/DESIGN.md; } 2>/dev/null; then
   echo "Kickoff artifacts detected. To continue an interrupted kickoff, follow 'Resuming an interrupted kickoff' in the using-project-kickoff skill."
   exit 0
 fi

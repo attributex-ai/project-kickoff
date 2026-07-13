@@ -17,7 +17,7 @@ When the verify gate is red, the failure mode to avoid is flailing: changing thi
 
 4. **Fix the cause.** Change the thing that is actually wrong. Do not adjust the test to stop failing, do not add a catch that swallows the error, do not weaken the verify script. Those hide the failure; they don't fix it.
 
-5. **Confirm.** Re-run the failing step, watch it pass for the right reason, then re-run the gate to confirm nothing else broke (`verify:quick` is acceptable mid-loop when the lockfile is unchanged; the full `verify` runs once at the loop's final confirmation).
+5. **Confirm.** Re-run the failing step, watch it pass for the right reason. If this debugging session began with a red verify gate, re-run the gate to confirm nothing else broke (`verify:quick` is acceptable mid-loop when the lockfile is unchanged; the full `verify` runs once at the loop's final confirmation). Otherwise re-run only the task's own check — the next full gate runs at execution's next milestone.
 
 ## Rules
 
