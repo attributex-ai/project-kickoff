@@ -61,7 +61,7 @@ Keep implementation notes short. You're sequencing and framing the work, not wri
 
 Order is not cosmetic — it front-loads risk and keeps the build bootable at every step.
 
-1. **Foundation `[STRUCT]` first.** Scaffold, database connection, env config — and, if a design was imported, the **design foundation**: the token file, self-hosted fonts, and the global stylesheet wired into the app shell. Nothing behavioral can be tested and no screen can be styled until the app boots with the theme applied, so these come first even though they're not test-driven.
+1. **Foundation `[STRUCT]` first.** Scaffold, database connection, env config — and, if a design was imported, the **design foundation**: the token file, self-hosted fonts, and the global stylesheet wired into the app shell. The design-foundation task moves or imports the files design-import staged under `design/` into the chosen stack's conventional locations and wires the token file into the app shell. Nothing behavioral can be tested and no screen can be styled until the app boots with the theme applied, so these come first even though they're not test-driven.
 2. **Critical `[TDD]` next, in this order:** authentication → multi-tenant isolation → payments/entitlement → admin authorization. These are the security-and-money boundaries. They're the highest-risk behavior and everything else assumes they work, so they get built and proven early.
 3. **Standard `[TDD]`** — the remaining behavioral features (chat edge cases, RAG retrieval, agent tool-wiring, etc.).
 4. **Remaining `[STRUCT]`** — deploy config, secondary presence checks, anything that just needs to exist.
