@@ -19,7 +19,7 @@ This is the final stage of: **questionnaire -> [design-import, when a design sou
 
 Go top to bottom. The plan is ordered to keep the app bootable and to front-load risk; don't reorder.
 
-**For each `[STRUCT]` task:** create what it names (scaffold, connection, config, dependency), confirm it's present and the app still boots, move on. Do not test-drive these — `verification-before-completion` presence-checks them.
+**For each `[STRUCT]` task:** create what it names (scaffold — named from the spec's Product line — connection, config, dependency), confirm it's present and the app still boots, move on. Do not test-drive these — `verification-before-completion` presence-checks them.
 
 **For each `[TDD]` task:** hand off to the `test-driven-development` skill and run its full red-green cycle — failing test first, then minimal code, then green. Do not implement behavioral code any other way.
 

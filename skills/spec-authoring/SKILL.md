@@ -32,7 +32,7 @@ The organizing rule, so you can classify anything not in the table below:
 
 | Questionnaire category | Behavioral (Criteria, TDD) | Structural (Checks, presence) |
 |---|---|---|
-| Project type | the core user flow it implies, if any | scaffold builds & boots |
+| Project type | the core product flows (the `core-*` chunk, from the Product line) | scaffold in the chosen stack builds & boots |
 | Authentication | all flows: 401s, session set, expiry, logout, redirects | SDK + env present |
 | Database | data rules & invariants, query scoping | connection, migrations, declared schema present |
 | Payments | charge, webhook→entitlement, refund→revoke | SDK, webhook endpoint, keys present |
@@ -54,12 +54,14 @@ Note the split categories. Database, admin, and each AI sub-type land in **both*
 
 Raw questionnaire answers are flags ("auth: yes"). Criteria need testable specifics ("unauthenticated requests to protected routes return 401"). Bridge that gap with a short interview, run in **digestible chunks with sign-off**, not one giant wall of questions.
 
-**Spend your interview budget proportionally.** The depth of questioning should match how behavioral a category is. Interrogate auth, payments, multi-tenant, and RAG hard, because that is where variance hurts and where tests bite. Breeze through deploy target, scaffold, and voice, because they are structural and there is little to specify. A good interview is lopsided on purpose.
+**Spend your interview budget proportionally.** The depth of questioning should match how behavioral a category is. Interrogate auth, payments, multi-tenant, and RAG hard, because that is where variance hurts and where tests bite — each gets its own chunk. Deploy target, scaffold, voice, and the mobile API contract are structural with little to specify: merge them into a single closing chunk. A good interview is lopsided on purpose.
 
-Work one behavioral category per chunk:
+**The first chunk is always Core product flows.** From the captured Product line, elicit the one to three primary user journeys and the data rules beneath them ("a signed-in user creates an invoice; it appears in their list and nowhere else"), emitted as ordinary criteria with IDs `core-<nnn>` — critical only where a flow touches money or a security boundary (then it needs its deny pair like any other criterion). The selected modules exist to serve these flows; spec them first so the spec describes a product, not a pile of plumbing.
+
+Work one chunk at a time, **propose-first**:
 1. State what you're about to pin down ("Let's nail the auth behavior.").
-2. Ask only the questions needed to write testable criteria for that category. Drive toward observable outcomes: status codes, redirects, what's in the DB after, what's denied.
-3. Reflect back the criteria you intend to write, in plain language, and get a yes before moving on.
+2. Draft the chunk's criteria (at most four) yourself, from the boundary table and the captured answers, driving toward observable outcomes: status codes, redirects, what's in the DB after, what's denied. Flag every assumption inline ("assumed httpOnly session cookie — correct?").
+3. Present the draft plus the genuinely open parameters in one turn, and get a yes — approve or amend — before moving on. Drafting first and asking second costs the person one read instead of two round-trips per category.
 
 **Enforce the constraints as you go.** The questionnaire may have produced an incoherent combination. Catch it here, conversationally:
 - RAG selected but no database → ask where vectors live; if there's genuinely no store, the combination is invalid, resolve it before proceeding.
@@ -183,6 +185,7 @@ A format is only enforced if you refuse to emit anything that violates it. Befor
 - If `critical`: does it have its allow/deny partner?
 - If it touches an LLM, payment, or third-party API: is `Mocked` filled?
 - Does every behavioral category the questionnaire selected have at least one criterion?
+- Does the spec contain at least one criterion for the product's core flow (`core-*`), not only module plumbing? If the build is genuinely flow-less (a static marketing site), is that recorded explicitly under Open questions?
 - Does every structural category have at least one check?
 - If the captured answers record a design source other than "none": does `design/DESIGN.md` exist? If not, stop — invoke `design-import` before emitting the spec.
 - If a design was imported: does the spec include structural checks for the token file (present + globally imported), fonts, each named component in the manifest, brand assets, and the app rendering with the theme applied?
@@ -199,7 +202,7 @@ Write `spec.md` to the project root and get final sign-off. Structure:
 # Project Specification
 
 ## Summary
-<2-4 sentences: what this project is, from the questionnaire answers>
+<2-4 sentences: what this project is, from the Product line and questionnaire answers>
 
 ## Selected modules
 <the questionnaire answers, as a flat list>

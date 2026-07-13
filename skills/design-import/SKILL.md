@@ -64,10 +64,12 @@ A design is frequently authored for a slightly (or wholly) different product tha
 
 Check and, where they diverge, resolve with the user:
 
-- **Product identity & copy.** Does the design's brand name, voice, and example copy match this project? A design synthesized for another product carries the wrong name and the wrong screens. Decide what to keep (the visual system) and what to replace (product nouns, marketing copy).
+- **Product identity & copy.** Does the design's brand name, voice, and example copy match the captured Product line (name + one-liner)? A design synthesized for another product carries the wrong name and the wrong screens. Decide what to keep (the visual system) and what to replace (product nouns, marketing copy).
 - **Screens vs. the app being built.** The design may fully compose a marketing homepage while the build is an authenticated product (or vice-versa). Confirm which screens get built to design fidelity, and flag the ones the design does not cover.
 - **Internal inconsistency in the design.** Designs drift between their written brief and their actual tokens (font families named in prose that differ from the token file; hex values in prose that differ from the variables). When they disagree, **the token file is the source of truth.** Record the conflict in the manifest so it is not rediscovered mid-build.
 - **Theme & platform coverage.** Note what the design does *not* specify — dark mode, responsive/mobile, states — so the spec can decide to fill the gap or scope it out explicitly rather than leaving execution to improvise.
+
+Run all four checks first, then present every mismatch in **one consolidated decision turn**, each with a recommended resolution the person can accept or override. Only follow up separately on an item whose resolution changes another item — mismatch-by-mismatch round-trips waste the person's time without improving the decisions.
 
 ---
 
