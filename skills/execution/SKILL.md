@@ -21,7 +21,7 @@ This is the final stage of: **questionnaire -> [design-import, when a design sou
 
 Go top to bottom. The plan is ordered to keep the app bootable and to front-load risk; don't reorder.
 
-**For each `[STRUCT]` task:** create what it names (scaffold — named from the spec's Product line — connection, config, dependency), confirm it's present and the app still boots, move on. Do not test-drive these — `verification-before-completion` presence-checks them.
+**For each `[STRUCT]` task:** create what it names (scaffold — named from the spec's Product line — connection, config, dependency), confirm its done-line, move on. Do not test-drive these — `verification-before-completion` presence-checks them.
 
 **For each `[TDD]` task:** hand off to the `test-driven-development` skill and run its full red-green cycle — failing test first, then minimal code, then green. Do not implement behavioral code any other way.
 
@@ -33,7 +33,9 @@ Go top to bottom. The plan is ordered to keep the app bootable and to front-load
 
 **Dependencies:** install as tasks require them. Choose current, compatible versions and let the lockfile pin them — copy resolved versions into the lockfile rather than leaving them floating. When a task needs a package, add it; don't defer.
 
-**The verify script:** early, right after the foundation `[STRUCT]` tasks, have `verification-before-completion` write the self-contained verify script into the project. Later tasks are checked against it as you go.
+**The verify script:** early, right after the foundation `[STRUCT]` tasks, have `verification-before-completion` write the self-contained verify script into the project — and run it twice in a row to confirm it terminates cleanly and leaves no process behind.
+
+**Gate cadence.** Per task, run only the task's own check — the `[TDD]` cycle's own test, or the `[STRUCT]` done-line. The full verify gate runs at exactly three milestones: right after the verify script is written (green baseline), after the critical security-and-money `[TDD]` block, and at finish. Never substitute a full gate for a per-task check or vice versa: per-task full gates multiply a 30-task build's wall-clock by the cost of install+build+boot, and skipped milestones let regressions hide until the end.
 
 ## Finishing the build
 

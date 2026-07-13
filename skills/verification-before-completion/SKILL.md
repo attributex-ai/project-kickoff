@@ -19,7 +19,11 @@ The script runs, in order, failing loudly on the first failure:
 3. **Lint** — passes with the project's own config (the scaffold's default ruleset).
 4. **Build** — the production build succeeds.
 5. **Test** — the full suite passes (where every `[TDD]` test runs).
-6. **Boot** — the app starts and the spec-named health route (or root route) responds 200.
+6. **Boot** — the app starts and the spec-named health route (or root route) responds 200. The boot step owns the lifecycle of what it starts, stated as obligations (the stack picks the mechanism): start the app in the background on an explicit port; poll the health route with a bounded timeout — fail after a fixed number of seconds, never wait indefinitely; guarantee the started process is killed when the step ends, on success and failure alike (a shell trap or the stack's equivalent); on failure, exit non-zero and surface the captured server log.
+
+Alongside `verify`, emit a `verify:quick` variant running the same stages minus install. During red-loop iterations `verify:quick` may stand in when the lockfile is unchanged since the last install; the final green before declaring done is always one full, clean, top-to-bottom `verify` including install.
+
+The gate is a milestone tool, not a per-task loop: execution runs it right after this script is first written, after the critical block, and at finish; individual tasks are checked by their own tests and done-lines.
 
 Output must be legible: on failure, surface the real error (failing test name, stack trace), not a truncated summary. You and the user will read it later.
 
@@ -47,6 +51,8 @@ run verify
   -> green: proceed to the completeness check
   -> red:  hand off to systematic-debugging, fix the specific cause, run verify again
 ```
+
+The script must be re-runnable back-to-back: it owns the lifecycle of anything it starts, and a second run must never fail because the first left a process or a port behind.
 
 Cap the loop at 5 debug → fix → re-run iterations per invocation of this skill. On hitting the ceiling: commit work-in-progress, then append or update a `## Verify status` block in `plan.md` recording the iteration count, the failing gate step, the failing criterion IDs, each fix attempted with its outcome, and the current root-cause hypothesis — so a resumed session starts from the record instead of re-grinding the same fixes blind. Then stop and give the user explicit options: authorize more iterations, descope the failing criterion (recorded with sign-off under spec.md's Open questions), or stop here. Do **not** grind indefinitely, and never "fix" a red result by weakening a test or the verify script — that defeats the entire gate. You make the code satisfy the gate; the gate never bends to the code.
 

@@ -48,8 +48,10 @@ You do not invent behavior. If the spec doesn't cover something the build obviou
 ```
 [STRUCT] <id> — <one-line presence statement>
   Verify:    <the check, mechanically>
-  Done when: present and the app still boots
+  Done when: present [and the app still boots]
 ```
+
+Choose each `Done when` deliberately: "present and the app still boots" for tasks touching the boot path (scaffold, app shell, runtime config, dependency install, a globally imported stylesheet — anything loaded at startup); plain "present" otherwise (deploy config, static assets), with boot re-confirmed at the next full-gate milestone. Re-booting the app after a task that cannot affect boot is pure wall-clock waste.
 
 Keep implementation notes short. You're sequencing and framing the work, not writing it. The executor reasons out the actual code.
 
