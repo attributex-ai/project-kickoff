@@ -4,7 +4,9 @@
   "private": true,
   "description": "Interview-driven, test-driven project generator plugin for Claude Code.",
   "scripts": {
-    "test": "bash tests/smoke-test.sh"
+    "test": "bash tests/smoke-test.sh",
+    "validate": "claude plugin validate .",
+    "check": "npm test && npm run validate"
   },
   "license": "MIT"
 }
