@@ -46,7 +46,7 @@ run verify
   -> red:  hand off to systematic-debugging, fix the specific cause, run verify again
 ```
 
-Cap the loop (default: 5 iterations). If it isn't green after the ceiling, stop and report clearly: what still fails, what was tried, and your best read on why. Do **not** grind indefinitely, and never "fix" a red result by weakening a test or the verify script — that defeats the entire gate. You make the code satisfy the gate; the gate never bends to the code.
+Cap the loop at 5 debug → fix → re-run iterations per invocation of this skill. On hitting the ceiling: commit work-in-progress, then append or update a `## Verify status` block in `plan.md` recording the iteration count, the failing gate step, the failing criterion IDs, each fix attempted with its outcome, and the current root-cause hypothesis — so a resumed session starts from the record instead of re-grinding the same fixes blind. Then stop and give the user explicit options: authorize more iterations, descope the failing criterion (recorded with sign-off under spec.md's Open questions), or stop here. Do **not** grind indefinitely, and never "fix" a red result by weakening a test or the verify script — that defeats the entire gate. You make the code satisfy the gate; the gate never bends to the code.
 
 ## When done is real
 

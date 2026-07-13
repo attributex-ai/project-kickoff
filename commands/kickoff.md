@@ -15,4 +15,6 @@ Invoke the `questionnaire` skill to interview the user about what they want to b
    - `verification-before-completion` as the definition of done, and
    - `systematic-debugging` whenever the verify gate goes red.
 
+If a previous kickoff was interrupted, use the "Resuming an interrupted kickoff" table in the `using-project-kickoff` skill to map the on-disk artifacts to the stage to re-enter, instead of starting over.
+
 Do not skip stages. Each produces a committed artifact the next consumes. Only the generated artifacts (spec.md, plan.md, the code, the tests, the verify script — and, when a design was imported, design/DESIGN.md plus the materialized tokens, fonts, and brand assets) belong in the project. None of this plugin's own files are copied into the generated project.

@@ -25,3 +25,4 @@ When the verify gate is red, the failure mode to avoid is flailing: changing thi
 - **Never weaken the gate to pass.** A red test or a failing check is information. Silencing it destroys the information and ships the bug.
 - **Respect the loop ceiling.** If `verification-before-completion` has hit its iteration cap, stop and report the root cause you found (or the point you got stuck at) rather than continuing to churn.
 - **The cause is usually recent and specific.** In a fresh build the break is almost always in the last thing added — a version mismatch, a missing env var, a mis-wired import. Start there.
+- **Read the record before repeating it.** If the project's `plan.md` has a `## Verify status` block, read its attempted-fixes list first and never repeat an attempt already recorded as failed.

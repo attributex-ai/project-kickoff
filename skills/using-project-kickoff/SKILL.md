@@ -15,7 +15,7 @@ Do **not** start the chain for changes to an existing, populated codebase. This 
 
 ## The chain
 
-Four stages, plus one conditional, each producing a committed artifact the next consumes:
+Four stages, plus one conditional. From spec-authoring on, every stage produces a committed artifact the next consumes; the questionnaire's capture becomes durable only when spec-authoring writes the skeleton `spec.md`.
 
 1. **`questionnaire`** — a dynamic, branching interview. Prunes questions that don't apply and rejects incoherent combinations. Captures answers — including the **design source** (a Claude Design project, a described direction, or none).
 2. **`design-import`** *(conditional — runs only when a design source was given)* — pulls the design from Claude Design (or a described direction), materializes tokens, fonts, brand assets, and a component inventory into the project as standalone files, reconciles it against the answers, and emits a `design/DESIGN.md` manifest the spec consumes. Skipped entirely when the design source is "none."
@@ -35,5 +35,19 @@ These are not stages; they are always-on rules the execution stage invokes:
 
 - **Generated artifacts stand alone.** The project must build, test, and run with this plugin uninstalled. Nothing generated may reference the plugin.
 - **Only generated artifacts persist in the project.** The plugin's own skills, commands, hooks, and manifests are never copied into the built project.
+
+## Resuming an interrupted kickoff
+
+Detect the stage from the artifacts on disk, then enter there:
+
+| On disk | Resume at |
+|---|---|
+| no `spec.md`, no `design/` | `questionnaire` — nothing durable existed yet |
+| `spec.md` with `Status: draft` | `spec-authoring` — resume the interview at the first category with no criteria |
+| `spec.md` approved, no `plan.md` | `planning` |
+| `plan.md` with unchecked tasks | `execution`'s resume procedure |
+| every task checked | `verification-before-completion` |
+
+If `plan.md` carries a `## Verify status` block, read it before any debugging — it records what already failed. Consistency check: if spec.md's Selected modules names a design source but `design/DESIGN.md` is absent, design-import was skipped — run it before proceeding.
 
 If you're ever unsure which skill applies, re-read this orientation and pick the earliest stage not yet done.

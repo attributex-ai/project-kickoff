@@ -92,7 +92,7 @@ Present the build order as a compact summary first — task counts per block, th
 Spec: spec.md (Version <n> — copied from spec.md's header)
 
 ## Build order
-<all tasks, in the order defined above, each with its tag and ID>
+<all tasks as markdown checkboxes — `- [ ] [TDD] auth-001 — ...` — in the order defined above, each with its tag and ID>
 
 ## Test harness
 <shared mocks/fixtures to stand up once, if any>
@@ -101,4 +101,4 @@ Spec: spec.md (Version <n> — copied from spec.md's header)
 <anything the spec didn't cover that the build will need; empty is good>
 ```
 
-`plan.md` is a permanent, standalone artifact — readable without this plugin installed. The execution skill works it top to bottom: `[TDD]` tasks red-green, `[STRUCT]` tasks present-and-boot. The verify gate's definition of done is stated in these tasks' terms — every `[TDD]` test green (both members of every critical allow/deny pair), every `[STRUCT]` check present, app boots. Keep IDs intact so a red test at the end traces straight back to one line of the spec.
+`plan.md` is a permanent, standalone artifact — readable without this plugin installed. After approval, exactly two edits to it are permitted: flipping a task's checkbox to `[x]` as the work lands, and appending/updating the `## Verify status` block defined in verification-before-completion. Everything else is frozen. The execution skill works it top to bottom: `[TDD]` tasks red-green, `[STRUCT]` tasks present-and-boot. The verify gate's definition of done is stated in these tasks' terms — every `[TDD]` test green (both members of every critical allow/deny pair), every `[STRUCT]` check present, app boots. Keep IDs intact so a red test at the end traces straight back to one line of the spec.

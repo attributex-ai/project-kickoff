@@ -25,6 +25,10 @@ Go top to bottom. The plan is ordered to keep the app bootable and to front-load
 
 **For each `[TDD]` task:** hand off to the `test-driven-development` skill and run its full red-green cycle — failing test first, then minimal code, then green. Do not implement behavioral code any other way.
 
+**Record progress as you go.** Flip the task's checkbox in plan.md to `[x]` in the same commit as the task's work (for `[TDD]` tasks, the commit the TDD cycle already makes). A plan whose checkboxes match reality is what makes an interrupted build resumable.
+
+**Resuming.** On entering execution with a plan that already has checked tasks, never restart from the top. If the project's verify script exists, run it first and debug any red before proceeding; then continue from the first unchecked task. If the verify script doesn't exist yet (interrupted before the foundation tasks finished), confirm the app state matches the checked tasks, then continue from the first unchecked one.
+
 **Design foundation runs early; design tasks are `[STRUCT]`.** If the plan has design-foundation tasks (token file, fonts, global stylesheet), work them right after scaffold so every later screen is built against the theme, not restyled afterward. Component and screen tasks are structural present-and-render work — build the component to the manifest's spec, confirm it renders, move on. Do not test-drive design and do not assert on colors or copy.
 
 **Dependencies:** install as tasks require them. Choose current, compatible versions and let the lockfile pin them — copy resolved versions into the lockfile rather than leaving them floating. When a task needs a package, add it; don't defer.
