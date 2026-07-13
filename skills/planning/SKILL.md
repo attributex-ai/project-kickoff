@@ -74,7 +74,7 @@ Within the critical block, respect dependencies: auth before anything tenant-awa
 
 Any `[TDD]` task whose criterion had a `Mocked` field needs its stub stood up *before* the test can run. Make that explicit as part of the task, because an executor that discovers mid-build that it needs a fake Stripe webhook will either improvise badly or hit a live API. For each such task, the `Mocked:` line names exactly what to stand up:
 
-- **Payments** → test-mode signed webhook payloads, a faked charge/session object. Never the live Stripe API.
+- **Payments** → test-mode signed webhook payloads plus a mis-signed payload for the authenticity deny test, a faked charge/session object. Never the live Stripe API.
 - **AI (any)** → a stubbed model client returning fixed responses; for RAG, fixed embedding vectors so retrieval is deterministic.
 - **Third-party APIs** → a recorded/stubbed response for the specific call.
 

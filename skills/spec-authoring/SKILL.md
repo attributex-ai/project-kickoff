@@ -35,7 +35,7 @@ The organizing rule, so you can classify anything not in the table below:
 | Project type | the core product flows (the `core-*` chunk, from the Product line) | scaffold in the chosen stack builds & boots |
 | Authentication | all flows: 401s, session set, expiry, logout, redirects | SDK + env present |
 | Database | data rules & invariants, query scoping | connection, migrations, declared schema present |
-| Payments | charge, webhook→entitlement, refund→revoke | SDK, webhook endpoint, keys present |
+| Payments | charge, webhook→entitlement, **unsigned/invalid webhook→rejected, entitlement unchanged**, refund→revoke | SDK, webhook endpoint, keys present |
 | Multi-tenant | **cross-tenant denial** (highest priority) | tenant_id plumbing present |
 | Admin portal | authorization boundary (who is allowed) | pages render & reachable |
 | AI: chat | edge cases: empty input, history scoping | endpoint streams & persists |
@@ -95,7 +95,7 @@ Five rules govern what may be emitted. They are not style preferences; each one 
 
 **2. One criterion, one behavior.** No `and` in the `Then` hiding two assertions. "Returns 401 and logs the attempt" is two criteria. Atomic criteria mean a red test names exactly one broken behavior.
 
-**3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it.
+**3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it. For payments the deny is webhook authenticity: a webhook that fails signature verification is rejected and changes no entitlement — an endpoint that trusts unsigned events hands out entitlements to anyone who can POST to it.
 
 **4. `Mocked` is mandatory whenever an external dependency appears.** Payments name the stub (test-mode signed webhook, faked charge). AI names the mocked model response. Any third-party API names its stub. A criterion that touches Stripe or an LLM with a blank `Mocked` field is malformed. This forces the test-isolation decision into the spec instead of leaving the agent to improvise it (or hit a live API) mid-build.
 
@@ -138,6 +138,15 @@ Then:     user U's entitlement record is set to active
 Mocked:   Stripe webhook event (test-mode signed payload)
 ```
 ```
+ID:       pay-005
+Feature:  Payments
+Priority: critical
+Given:    a checkout session for user U
+When:     a payment_succeeded webhook with an invalid signature is received
+Then:     response status is 400 and user U's entitlement record is unchanged
+Mocked:   Stripe webhook event (mis-signed payload)
+```
+```
 ID:       rag-002
 Feature:  AI / RAG
 Priority: standard
@@ -148,7 +157,7 @@ Fixture:  corpus seeded with D
 Mocked:   embedding model returns fixed vectors; LLM generation stubbed
 ```
 
-`rag-002` tests retrieval mechanics, not answer quality, and mocks the model. The format carried the AI rule automatically — follow the same instinct everywhere an LLM appears.
+`rag-002` tests retrieval mechanics, not answer quality, and mocks the model. The format carried the AI rule automatically — follow the same instinct everywhere an LLM appears. Note the pairing: `auth-001`/`auth-002` and `pay-004`/`pay-005` show full allow/deny pairs; `tenant-001` is the deny half of a pair whose allow partner is omitted here for brevity — a real spec emits both halves.
 
 ---
 
