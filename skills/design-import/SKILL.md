@@ -83,6 +83,9 @@ Write `design/DESIGN.md` into the project root (a permanent, standalone artifact
 ## Source
 <claude-design:<url-or-id> | described> — imported <how>. Token file is the source of truth.
 
+## Captured answers
+<the questionnaire's handoff block, copied verbatim — the durable record of the answers until spec.md exists>
+
 ## Tokens
 - Staged at: <design/... path>
 - Wiring: imported into the app shell by the design-foundation task once scaffolded; that task updates this entry to the final path

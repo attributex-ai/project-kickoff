@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Decide whether a generated project is actually done, and write its verify script. Use this skill twice: early in the execution stage, right after the foundation [STRUCT] tasks, to write the self-contained verify script into the project; and at the end, before reporting a build complete or any time you are about to claim a project is finished or working. It checks two things: correctness (installs, typechecks, builds, boots, tests pass) and completeness (every module the spec promised is present and wired). "Done" is a green gate plus full coverage of the spec, never the agent's say-so. This is the project-kickoff chain's definition of done — it writes the generated project's standalone verify script and checks completeness against spec.md. Trigger before declaring any build complete.
+description: Decide whether a generated project is actually done, and write its verify script. Use this skill twice — early in the execution stage, right after the foundation [STRUCT] tasks, to write the self-contained verify script into the project; and at the end, before reporting a build complete or any time you are about to claim a project is finished or working. It checks two things — correctness (installs, typechecks, builds, boots, tests pass) and completeness (every module the spec promised is present and wired). "Done" is a green gate plus full coverage of the spec, never the agent's say-so. This is the project-kickoff chain's definition of done — it writes the generated project's standalone verify script and checks completeness against spec.md. Trigger before declaring any build complete.
 ---
 
 # Verification Before Completion
@@ -18,7 +18,7 @@ The script runs, in order, failing loudly on the first failure:
 2. **Typecheck** — no type errors.
 3. **Lint** — passes with the project's own config (the scaffold's default ruleset).
 4. **Build** — the production build succeeds.
-5. **Test** — the full suite passes (where every `[TDD]` test runs).
+5. **Test** — the full suite passes (where every `[TDD]` test runs). An empty suite passes: configure the runner so "no tests found" is success (e.g. a pass-with-no-tests flag), making the post-foundation green baseline reachable before any behavioral task exists. A failing test always fails.
 6. **Boot** — the app starts and the spec-named health route (or root route) responds 200. The boot step owns the lifecycle of what it starts, stated as obligations (the stack picks the mechanism): start the app in the background on an explicit port; poll the health route with a bounded timeout — fail after a fixed number of seconds, never wait indefinitely; guarantee the started process is killed when the step ends, on success and failure alike (a shell trap or the stack's equivalent); on failure, exit non-zero and surface the captured server log.
 
 Alongside `verify`, emit a `verify:quick` variant running the same stages minus install. During red-loop iterations `verify:quick` may stand in when the lockfile is unchanged since the last install; the final green before declaring done is always one full, clean, top-to-bottom `verify` including install.
@@ -40,7 +40,7 @@ A green verify proves **correctness**. It does not prove **completeness** — th
 - Every `critical` criterion has **both** members of its allow/deny pair passing.
 - Every structural category has its `[STRUCT]` check satisfied.
 - Every module listed under Selected modules in `spec.md` is physically present and wired.
-- If a design was imported: every design check the spec emitted passes, with a backstop of at least one check per `design/DESIGN.md` manifest section (tokens, fonts, components, assets, theme-applied). A build that compiles with unstyled placeholder pages is **not** complete.
+- If a design was imported: every design check the spec emitted passes, with a backstop of at least one check per `design/DESIGN.md` manifest section (tokens, fonts, components, assets, theme-applied) not marked "none staged — out of scope". A build that compiles with unstyled placeholder pages is **not** complete.
 
 If anything the spec promised is missing, the build is **not done** — return to execution and build it. "Compiles and boots" is necessary, not sufficient.
 
@@ -54,8 +54,8 @@ run verify
 
 The script must be re-runnable back-to-back: it owns the lifecycle of anything it starts, and a second run must never fail because the first left a process or a port behind.
 
-Cap the loop at 5 debug → fix → re-run iterations per invocation of this skill. On hitting the ceiling: commit work-in-progress, then append or update a `## Verify status` block in `plan.md` recording the iteration count, the failing gate step, the failing criterion IDs, each fix attempted with its outcome, and the current root-cause hypothesis — so a resumed session starts from the record instead of re-grinding the same fixes blind. Then stop and give the user explicit options: authorize more iterations, descope the failing criterion (recorded with sign-off under spec.md's Open questions, bumping the spec Version and updating plan.md's recorded Version in the same commit), or stop here. Do **not** grind indefinitely, and never "fix" a red result by weakening a test or the verify script — that defeats the entire gate. You make the code satisfy the gate; the gate never bends to the code.
+Cap the loop at 5 debug → fix → re-run iterations per invocation of this skill. On hitting the ceiling: commit work-in-progress, then append or update a `## Verify status` block in `plan.md` recording the iteration count, the failing gate step, the failing criterion IDs, each fix attempted with its outcome, and the current root-cause hypothesis — so a resumed session starts from the record instead of re-grinding the same fixes blind. Then stop and give the user explicit options: authorize more iterations, descope the failing criterion (recorded with its ID and sign-off under spec.md's Open questions; in the same commit, bump the spec Version, update plan.md's recorded Version, and mark the criterion's task `- [-]` descoped so no resume re-attempts it), or stop here. Do **not** grind indefinitely, and never "fix" a red result by weakening a test or the verify script — that defeats the entire gate. You make the code satisfy the gate; the gate never bends to the code.
 
 ## When done is real
 
-`verify` is green, both halves pass, and the verify script runs standalone with the plugin uninstalled. Report the verify and completeness results to the invoking execution stage — it owns the single final user-facing report, after its documentation steps. Only now is the build complete.
+`verify` is green, both halves pass, and the verify script runs standalone with the plugin uninstalled. Report the verify and completeness results to the invoking execution stage — it owns the single final user-facing report, after its documentation steps. If nothing invoked you (a direct resume into a fully checked plan), enter execution's finishing steps rather than declaring completion yourself. Only now is the build complete.

@@ -80,7 +80,7 @@ Any `[TDD]` task whose criterion had a `Mocked` field needs its stub stood up *b
 - **AI (any)** → a stubbed model client returning fixed responses; for RAG, fixed embedding vectors so retrieval is deterministic.
 - **Third-party APIs** → a recorded/stubbed response for the specific call.
 
-If several tasks share a mock (e.g. a common stubbed model client), add a single early `[STRUCT]` task to build the test harness/mocks, and have the `[TDD]` tasks depend on it.
+If several tasks share a mock (e.g. a common stubbed model client), add a single early `[STRUCT]` task to build the test harness/mocks, and have the `[TDD]` tasks depend on it. Give it the reserved ID `plan-harness-001` — the `plan-` prefix marks plan-authored infrastructure with no spec line, and execution's intake accepts it; every other task ID must trace to the spec.
 
 ---
 
@@ -103,4 +103,4 @@ Spec: spec.md (Version <n> — copied from spec.md's header)
 <anything the spec didn't cover that the build will need; empty is good>
 ```
 
-`plan.md` is a permanent, standalone artifact — readable without this plugin installed. After approval, exactly three edits to it are permitted: flipping a task's checkbox to `[x]` as the work lands, appending/updating the `## Verify status` block defined in verification-before-completion, and updating the recorded `Spec: ... Version` line when a signed-off spec revision (e.g. a mid-execution descope) lands. Everything else is frozen. The execution skill works it top to bottom: `[TDD]` tasks red-green, `[STRUCT]` tasks by their done-lines (present, or present-and-boot for boot-path tasks). The verify gate's definition of done is stated in these tasks' terms — every `[TDD]` test green (both members of every critical allow/deny pair), every `[STRUCT]` check present, app boots. Keep IDs intact so a red test at the end traces straight back to one line of the spec.
+`plan.md` is a permanent, standalone artifact — readable without this plugin installed. After approval, exactly three edits to it are permitted: flipping a task's checkbox to `[x]` as the work lands, appending/updating the `## Verify status` block defined in verification-before-completion, and — when a signed-off spec revision (e.g. a mid-execution descope) lands — updating the recorded `Spec: ... Version` line and marking any descoped criterion's task `- [-]` (descoped; see spec.md's Open questions). Everything else is frozen. The execution skill works it top to bottom: `[TDD]` tasks red-green, `[STRUCT]` tasks by their done-lines (present, or present-and-boot for boot-path tasks). The verify gate's definition of done is stated in these tasks' terms — every `[TDD]` test green (both members of every critical allow/deny pair), every `[STRUCT]` check present, app boots. Keep IDs intact so a red test at the end traces straight back to one line of the spec.

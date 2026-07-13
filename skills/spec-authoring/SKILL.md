@@ -90,7 +90,7 @@ When:      <the single action taken>
 Then:      <the observable, assertable result>
 Fixture:   <test data/state that must exist>   (optional)
 Mocked:    <external deps stubbed>              (required when it touches an LLM, payment, or 3rd-party API)
-Pair:      <ID of the allow/deny partner>       (required when Priority: critical)
+Pair:      <deny only: ID of the allow it guards> (required on critical denies)
 ```
 
 Five rules govern what may be emitted. They are not style preferences; each one prevents a specific downstream failure.
@@ -99,7 +99,7 @@ Five rules govern what may be emitted. They are not style preferences; each one 
 
 **2. One criterion, one behavior.** No `and` in the `Then` hiding two assertions. "Returns 401 and logs the attempt" is two criteria. Atomic criteria mean a red test names exactly one broken behavior. One deliberate exception: a deny criterion may assert the rejection plus the absence of the side effect it guards ("status is 400 and entitlement unchanged") — that is one behavior, the refusal, observed at two points.
 
-**3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it. Record the partnership in each half's `Pair:` field so planning and verification can check pair coverage mechanically. For payments the deny is webhook authenticity: a webhook that fails signature verification is rejected and changes no entitlement — an endpoint that trusts unsigned events hands out entitlements to anyone who can POST to it.
+**3. Critical criteria come in allow/deny pairs.** For every security or money boundary, write the success case *and* its violation. Auth is "valid login succeeds" plus "invalid login is rejected" plus "no session is rejected." The deny cases catch the real bugs and are the ones an agent skips under pressure. A lone happy-path criterion at `critical` priority with no matching denial is a spec smell — do not emit it. Record the pairing on each deny's `Pair:` field, naming the allow it guards — the deny points at the allow, never the reverse, because an allow may have several denies (auth above has two). Coverage is then mechanically checkable: every critical allow must have at least one deny naming it. For payments the deny is webhook authenticity: a webhook that fails signature verification is rejected and changes no entitlement — an endpoint that trusts unsigned events hands out entitlements to anyone who can POST to it.
 
 **4. `Mocked` is mandatory whenever an external dependency appears.** Payments name the stub (test-mode signed webhook, faked charge). AI names the mocked model response. Any third-party API names its stub. A criterion that touches Stripe or an LLM with a blank `Mocked` field is malformed. This forces the test-isolation decision into the spec instead of leaving the agent to improvise it (or hit a live API) mid-build.
 
@@ -123,7 +123,6 @@ Priority: critical
 Given:    a valid user credential
 When:     POST /api/login with that credential
 Then:     response sets an httpOnly session cookie
-Pair:     auth-001
 ```
 ```
 ID:       tenant-001
@@ -143,7 +142,6 @@ Given:    a checkout session for user U
 When:     a payment_succeeded webhook for that session is received
 Then:     user U's entitlement record is set to active
 Mocked:   Stripe webhook event (test-mode signed payload)
-Pair:     pay-005
 ```
 ```
 ID:       pay-005
@@ -166,7 +164,7 @@ Fixture:  corpus seeded with D
 Mocked:   embedding model returns fixed vectors; LLM generation stubbed
 ```
 
-`rag-002` tests retrieval mechanics, not answer quality, and mocks the model. The format carried the AI rule automatically — follow the same instinct everywhere an LLM appears. Note the pairing: `auth-001`/`auth-002` and `pay-004`/`pay-005` show full allow/deny pairs; `tenant-001` is the deny half of a pair whose allow partner is omitted here for brevity — a real spec emits both halves.
+`rag-002` tests retrieval mechanics, not answer quality, and mocks the model. The format carried the AI rule automatically — follow the same instinct everywhere an LLM appears. Note the pairing: denies carry `Pair:` naming their allow — `auth-001` names `auth-002`, `pay-005` names `pay-004`, and `tenant-001` names `tenant-002`, an allow partner omitted here for brevity; a real spec emits both halves.
 
 ---
 
@@ -202,14 +200,14 @@ A format is only enforced if you refuse to emit anything that violates it. Befor
 
 - Is the `Then` observable and binary? (No "secure/correct/properly.")
 - Is it exactly one behavior? (No hidden `and` — except a deny's rejection plus the absence of its guarded side effect.)
-- If `critical`: does it have its allow/deny partner, recorded in both `Pair:` fields?
+- If `critical`: does every deny name its allow in `Pair:`, and does every allow have at least one deny naming it?
 - If it touches an LLM, payment, or third-party API: is `Mocked` filled?
 - Does every behavioral category the questionnaire selected have at least one criterion?
 - Does the spec contain at least one criterion for the product's core flow (`core-*`), not only module plumbing? If the build is genuinely flow-less (a static marketing site), is that recorded explicitly under Open questions?
 - Does every structural category have at least one check?
 - Are the always-on checks present: .gitignore, .env.example (placeholders only), the health/root route, lint with the project's own config — and, for any UI, the viewport meta + global stylesheet baseline?
 - If the captured answers record a design source other than "none": does `design/DESIGN.md` exist? If not, stop — invoke `design-import` before emitting the spec.
-- If a design was imported: does the spec include structural checks for the token file (present + globally imported), fonts, each named component in the manifest, brand assets, and the app rendering with the theme applied?
+- If a design was imported: does the spec include structural checks for the token file (present + globally imported), fonts, each named component in the manifest, brand assets, and the app rendering with the theme applied — skipping any section the manifest marks "none staged — out of scope" (a described direction stages only tokens)?
 
 If a criterion can't be made to pass this gate, the underlying answer is still too vague — go back to the interview for that one category rather than emitting a criterion no honest test can be written from. This refusal is the point.
 

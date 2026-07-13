@@ -17,7 +17,7 @@ This is the final stage of: **questionnaire -> [design-import, when a design sou
 
 ## Working the plan
 
-**Intake first.** Verify plan.md's recorded spec Version matches spec.md's current header — a mismatch means the spec was revised after planning; return to planning. Verify every task carries exactly one `[TDD]`/`[STRUCT]` tag and an ID that exists in spec.md — defects go back to planning; never improvise around them. If plan approval can't be established (a resumed session), show the build order and get a go-ahead before task 1.
+**Intake first.** Verify plan.md's recorded spec Version matches spec.md's current header — a mismatch means the spec was revised after planning; return to planning. Verify every task carries exactly one `[TDD]`/`[STRUCT]` tag and an ID that exists in spec.md — or the reserved `plan-` prefix marking plan-authored infrastructure (the shared test-harness task). Other defects go back to planning; never improvise around them. If plan approval can't be established (a resumed session), show the build order and get a go-ahead before task 1.
 
 Go top to bottom. The plan is ordered to keep the app bootable and to front-load risk; don't reorder.
 
@@ -27,7 +27,7 @@ Go top to bottom. The plan is ordered to keep the app bootable and to front-load
 
 **Record progress as you go.** Flip the task's checkbox in plan.md to `[x]` in the same commit as the task's work (for `[TDD]` tasks, the commit the TDD cycle already makes). A plan whose checkboxes match reality is what makes an interrupted build resumable.
 
-**Resuming.** On entering execution with a plan that already has checked tasks, never restart from the top. If the project's verify script exists, run it first and debug any red before proceeding; then continue from the first unchecked task. If the verify script doesn't exist yet (interrupted before the foundation tasks finished), confirm the app state matches the checked tasks, then continue from the first unchecked one.
+**Resuming.** On entering execution with a plan that already has checked tasks, never restart from the top. If the project's verify script exists, run it first and debug any red before proceeding; then continue from the first unchecked task (`- [ ]`; tasks marked `- [-]` are descoped — skip them). If the verify script doesn't exist yet (interrupted before the foundation tasks finished), confirm the app state matches the checked tasks, then continue from the first unchecked one.
 
 **Design foundation runs early; design tasks are `[STRUCT]`.** If the plan has design-foundation tasks (token file, fonts, global stylesheet), work them right after scaffold so every later screen is built against the theme, not restyled afterward. The design-foundation task takes the files design-import staged under `design/`, wires them into the scaffolded app (global stylesheet import, font loader, asset locations), and updates design/DESIGN.md's Tokens/Fonts/Assets entries to the final paths so the manifest matches reality before verification. Component and screen tasks are structural present-and-render work — build the component to the manifest's spec, confirm it renders, move on. Do not test-drive design and do not assert on colors or copy.
 
@@ -35,7 +35,7 @@ Go top to bottom. The plan is ordered to keep the app bootable and to front-load
 
 **The verify script:** early, right after the foundation `[STRUCT]` tasks, have `project-kickoff:verification-before-completion` write the self-contained verify script into the project — and run it twice in a row to confirm it terminates cleanly and leaves no process behind.
 
-**Gate cadence.** Per task, run only the task's own check — the `[TDD]` cycle's own test, or the `[STRUCT]` done-line. The full verify gate runs at exactly three milestones: right after the verify script is written (green baseline), after the critical security-and-money `[TDD]` block, and at finish. Never substitute a full gate for a per-task check or vice versa: per-task full gates multiply a 30-task build's wall-clock by the cost of install+build+boot, and skipped milestones let regressions hide until the end.
+**Gate cadence.** Per task, run only the task's own check — the `[TDD]` cycle's own test, or the `[STRUCT]` done-line. The full verify gate runs at exactly three milestones: right after the verify script is written (green baseline — reachable because the Test stage passes on an empty suite by contract), after the critical security-and-money `[TDD]` block, and at finish. Never substitute a full gate for a per-task check or vice versa: per-task full gates multiply a 30-task build's wall-clock by the cost of install+build+boot, and skipped milestones let regressions hide until the end.
 
 ## Finishing the build
 

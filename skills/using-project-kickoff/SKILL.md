@@ -45,11 +45,12 @@ Detect the stage from the artifacts on disk, then enter there:
 | On disk | Resume at |
 |---|---|
 | no `spec.md`, no `design/` | `questionnaire` — nothing durable existed yet |
-| `design/DESIGN.md` present, no `spec.md` | `spec-authoring` — design-import is done, don't re-run it; re-confirm the questionnaire answers first (only the design source and reconciliation decisions survive in the manifest) |
+| `design/` staged files, no `design/DESIGN.md` | `design-import` — re-confirm the questionnaire answers with the user (not yet durable), keep valid staged files, and finish from the manifest step |
+| `design/DESIGN.md` present, no `spec.md` | `spec-authoring` — design-import is done, don't re-run it; read the questionnaire answers from the manifest's Captured answers section |
 | `spec.md` with `Status: draft` | `spec-authoring` — resume the interview at the first category with no criteria |
 | `spec.md` approved, no `plan.md` | `planning` |
 | `plan.md` with unchecked tasks | `execution`'s resume procedure |
-| every task checked | `project-kickoff:verification-before-completion` |
+| every task checked or descoped | `execution`'s finishing steps — verify via `project-kickoff:verification-before-completion`, then document and report |
 
 If `plan.md` carries a `## Verify status` block, read it before any debugging — it records what already failed. Consistency check: if spec.md's Selected modules names a design source but `design/DESIGN.md` is absent, design-import was skipped — run it before proceeding.
 
