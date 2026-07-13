@@ -17,6 +17,8 @@ This is the final stage of: **questionnaire -> [design-import, when a design sou
 
 ## Working the plan
 
+**Intake first.** Verify plan.md's recorded spec Version matches spec.md's current header — a mismatch means the spec was revised after planning; return to planning. Verify every task carries exactly one `[TDD]`/`[STRUCT]` tag and an ID that exists in spec.md — defects go back to planning; never improvise around them. If plan approval can't be established (a resumed session), show the build order and get a go-ahead before task 1.
+
 Go top to bottom. The plan is ordered to keep the app bootable and to front-load risk; don't reorder.
 
 **For each `[STRUCT]` task:** create what it names (scaffold — named from the spec's Product line — connection, config, dependency), confirm it's present and the app still boots, move on. Do not test-drive these — `verification-before-completion` presence-checks them.

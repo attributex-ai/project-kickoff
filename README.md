@@ -83,7 +83,7 @@ For separate stable/latest channels, or to keep the catalog in its own repo, see
 
 ## Versioning
 
-`version` is intentionally omitted from both manifests. For a git-hosted, actively developed plugin, Claude Code treats every new commit as a new version, which suits daily iteration. To pin releases later, set `version` in `plugin.json` only, and bump it each release. (The `spec_version` inside each generated `spec.md` is separate — it versions the generated spec format for resumability, not this plugin.)
+`version` is intentionally omitted from both manifests. For a git-hosted, actively developed plugin, Claude Code treats every new commit as a new version, which suits daily iteration. To pin releases later, set `version` in `plugin.json` only, and bump it each release. (The `Version:` header inside each generated `spec.md` is separate — it lets a resumed session detect a stale plan against a revised spec; it does not version this plugin.)
 
 ## The session-start nudge
 

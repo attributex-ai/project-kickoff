@@ -196,10 +196,19 @@ If a criterion can't be made to pass this gate, the underlying answer is still t
 
 ## Output
 
-Write `spec.md` to the project root and get final sign-off. Structure:
+Persist as you go, not only at the end — the interview is the chain's largest window of unrecoverable user investment:
+
+- **On receiving the handoff, before the first chunk:** write and commit a skeleton `spec.md` containing the Summary, the complete `## Selected modules` list (this durably captures the questionnaire answers, including the design source), and a `Status: draft` header.
+- **After each chunk's sign-off:** append that chunk's criteria and checks, and commit.
+- **At final sign-off:** flip the header to `Status: approved`. Any post-sign-off revision increments `Version` and requires re-sign-off.
+
+Structure:
 
 ```markdown
 # Project Specification
+
+Status: draft | approved
+Version: 1
 
 ## Summary
 <2-4 sentences: what this project is, from the Product line and questionnaire answers>

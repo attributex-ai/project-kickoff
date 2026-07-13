@@ -13,6 +13,12 @@ The plan is where the behavioral/structural split stops being a table and become
 
 ---
 
+## Intake
+
+Before decomposing anything, confirm `spec.md`'s header reads `Status: approved`, and that the spec passes spec-authoring's self-check gate (defined in the spec-authoring skill — reference it, don't restate it). A draft spec goes back to spec-authoring to finish the interview; a malformed one goes back for repair. Never plan around a malformed spec.
+
+---
+
 ## The one rule: preserve the split, by tag
 
 - Every **criterion** in the spec becomes exactly one `[TDD]` task.
@@ -78,12 +84,12 @@ If several tasks share a mock (e.g. a common stubbed model client), add a single
 
 ## Output
 
-Write `plan.md` to the project root and commit it. Structure:
+Present the build order as a compact summary first — task counts per block, the critical block's contents, shared mocks, open questions — and write and commit `plan.md` only after an explicit yes. This is the last cheap veto point before hours of building; execution assumes an *approved* plan. Structure:
 
 ```markdown
 # Implementation Plan
 
-Spec: spec.md (<spec version>)
+Spec: spec.md (Version <n> — copied from spec.md's header)
 
 ## Build order
 <all tasks, in the order defined above, each with its tag and ID>
