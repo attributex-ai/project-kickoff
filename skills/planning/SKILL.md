@@ -1,15 +1,21 @@
 ---
 name: planning
-description: Turn an approved project spec into an ordered, tagged implementation plan. Use this skill immediately after spec-authoring has produced and the person has signed off on spec.md, and before any code is written. It reads the spec's acceptance criteria and structural checks and emits plan.md, where every criterion becomes a test-first [TDD] task and every check becomes a present-and-boot [STRUCT] task, ordered with critical security and payment work first. Trigger whenever spec.md exists and the next step is planning the build, or when someone asks to "write the plan," "decompose the spec," or "turn the spec into tasks." Do not begin execution directly from a spec; the plan is what makes the build test-driven.
+description: Turn an approved project spec into an ordered, tagged implementation plan. Use this skill immediately after spec-authoring has produced and the person has signed off on spec.md, and before any code is written. It reads the spec's acceptance criteria and structural checks and emits plan.md, where every criterion becomes a test-first [TDD] task and every check becomes a presence-verified [STRUCT] task, ordered with critical security and payment work first. Trigger whenever a spec.md produced by this chain exists and the next step is planning the build, or when someone asks to turn that kickoff spec into tasks. Do not trigger for spec or plan documents in an existing codebase that did not come from this chain. Do not begin execution directly from a spec; the plan is what makes the build test-driven.
 ---
 
 # Implementation Planning
 
 You have an approved `spec.md` containing two lists: behavioral **criteria** (Given/When/Then) and structural **checks** (presence assertions). Your job is to turn them into an ordered task list that the execution skill works top to bottom. You write `plan.md`. You do not write code.
 
-This is link three of: **questionnaire → spec → plan (you are here) → execution.**
+This skill's place in the chain: **questionnaire → [design-import, when a design source was captured] → spec → plan (you are here) → execution.**
 
 The plan is where the behavioral/structural split stops being a table and becomes something the executor mechanically obeys. Every task carries a tag that tells the executor *how* to satisfy it — by going red-green, or by verifying presence. Get the tags and the order right and the build is honest. Get them wrong and TDD collapses back into ceremony.
+
+---
+
+## Intake
+
+Before decomposing anything, confirm `spec.md`'s header reads `Status: approved`, and that the spec passes spec-authoring's self-check gate (defined in the spec-authoring skill — reference it, don't restate it). A draft spec goes back to spec-authoring to finish the interview; a malformed one goes back for repair. Never plan around a malformed spec.
 
 ---
 
@@ -42,8 +48,10 @@ You do not invent behavior. If the spec doesn't cover something the build obviou
 ```
 [STRUCT] <id> — <one-line presence statement>
   Verify:    <the check, mechanically>
-  Done when: present and the app still boots
+  Done when: present [and the app still boots]
 ```
+
+Choose each `Done when` deliberately: "present and the app still boots" for tasks touching the boot path (scaffold, app shell, runtime config, dependency install, a globally imported stylesheet — anything loaded at startup); plain "present" otherwise (deploy config, static assets), with boot re-confirmed at the next full-gate milestone. Re-booting the app after a task that cannot affect boot is pure wall-clock waste.
 
 Keep implementation notes short. You're sequencing and framing the work, not writing it. The executor reasons out the actual code.
 
@@ -53,7 +61,7 @@ Keep implementation notes short. You're sequencing and framing the work, not wri
 
 Order is not cosmetic — it front-loads risk and keeps the build bootable at every step.
 
-1. **Foundation `[STRUCT]` first.** Scaffold, database connection, env config — and, if a design was imported, the **design foundation**: the token file, self-hosted fonts, and the global stylesheet wired into the app shell. Nothing behavioral can be tested and no screen can be styled until the app boots with the theme applied, so these come first even though they're not test-driven.
+1. **Foundation `[STRUCT]` first.** Scaffold, database connection, env config — and, if a design was imported, the **design foundation**: the token file, self-hosted fonts, and the global stylesheet wired into the app shell. The design-foundation task moves or imports the files design-import staged under `design/` into the chosen stack's conventional locations and wires the token file into the app shell. Nothing behavioral can be tested and no screen can be styled until the app boots with the theme applied, so these come first even though they're not test-driven.
 2. **Critical `[TDD]` next, in this order:** authentication → multi-tenant isolation → payments/entitlement → admin authorization. These are the security-and-money boundaries. They're the highest-risk behavior and everything else assumes they work, so they get built and proven early.
 3. **Standard `[TDD]`** — the remaining behavioral features (chat edge cases, RAG retrieval, agent tool-wiring, etc.).
 4. **Remaining `[STRUCT]`** — deploy config, secondary presence checks, anything that just needs to exist.
@@ -68,25 +76,25 @@ Within the critical block, respect dependencies: auth before anything tenant-awa
 
 Any `[TDD]` task whose criterion had a `Mocked` field needs its stub stood up *before* the test can run. Make that explicit as part of the task, because an executor that discovers mid-build that it needs a fake Stripe webhook will either improvise badly or hit a live API. For each such task, the `Mocked:` line names exactly what to stand up:
 
-- **Payments** → test-mode signed webhook payloads, a faked charge/session object. Never the live Stripe API.
+- **Payments** → test-mode signed webhook payloads plus a mis-signed payload for the authenticity deny test, a faked charge/session object. Never the live Stripe API.
 - **AI (any)** → a stubbed model client returning fixed responses; for RAG, fixed embedding vectors so retrieval is deterministic.
 - **Third-party APIs** → a recorded/stubbed response for the specific call.
 
-If several tasks share a mock (e.g. a common stubbed model client), add a single early `[STRUCT]` task to build the test harness/mocks, and have the `[TDD]` tasks depend on it.
+If several tasks share a mock (e.g. a common stubbed model client), add a single early `[STRUCT]` task to build the test harness/mocks, and have the `[TDD]` tasks depend on it. Give it the reserved ID `plan-harness-001` — the `plan-` prefix marks plan-authored infrastructure with no spec line, and execution's intake accepts it; every other task ID must trace to the spec.
 
 ---
 
 ## Output
 
-Write `plan.md` to the project root and commit it. Structure:
+Present the build order as a compact summary first — task counts per block, the critical block's contents, shared mocks, open questions — and write and commit `plan.md` only after an explicit yes. This is the last cheap veto point before hours of building; execution assumes an *approved* plan. Structure:
 
 ```markdown
 # Implementation Plan
 
-Spec: spec.md (<spec version>)
+Spec: spec.md (Version <n> — copied from spec.md's header)
 
 ## Build order
-<all tasks, in the order defined above, each with its tag and ID>
+<all tasks as markdown checkboxes — `- [ ] [TDD] auth-001 — ...` — in the order defined above, each with its tag and ID>
 
 ## Test harness
 <shared mocks/fixtures to stand up once, if any>
@@ -95,4 +103,4 @@ Spec: spec.md (<spec version>)
 <anything the spec didn't cover that the build will need; empty is good>
 ```
 
-`plan.md` is a permanent, standalone artifact — readable without this plugin installed. The execution skill works it top to bottom: `[TDD]` tasks red-green, `[STRUCT]` tasks present-and-boot. The verify gate's definition of done is stated in these tasks' terms — every `[TDD]` test green (both members of every critical allow/deny pair), every `[STRUCT]` check present, app boots. Keep IDs intact so a red test at the end traces straight back to one line of the spec.
+`plan.md` is a permanent, standalone artifact — readable without this plugin installed. After approval, exactly three edits to it are permitted: flipping a task's checkbox to `[x]` as the work lands, appending/updating the `## Verify status` block defined in verification-before-completion, and — when a signed-off spec revision (e.g. a mid-execution descope) lands — updating the recorded `Spec: ... Version` line and marking any descoped criterion's task `- [-]` (descoped; see spec.md's Open questions). Everything else is frozen. The execution skill works it top to bottom: `[TDD]` tasks red-green, `[STRUCT]` tasks by their done-lines (present, or present-and-boot for boot-path tasks). The verify gate's definition of done is stated in these tasks' terms — every `[TDD]` test green (both members of every critical allow/deny pair), every `[STRUCT]` check present, app boots. Keep IDs intact so a red test at the end traces straight back to one line of the spec.

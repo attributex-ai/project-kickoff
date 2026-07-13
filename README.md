@@ -7,7 +7,7 @@ A Claude Code plugin that scaffolds a new, self-verifying project through a stag
 An interview becomes a testable spec, the spec becomes a tagged plan, the plan becomes a build that proves every promised behavior with a test before it counts as done.
 
 **Chain** (each stage emits a committed artifact the next consumes):
-`questionnaire` -> `spec-authoring` -> `planning` -> `execution`
+`questionnaire` -> `design-import` *(conditional — runs only when a design source was captured)* -> `spec-authoring` -> `planning` -> `execution`
 
 **Disciplines** (enforced across the build):
 `test-driven-development` (red-green for every behavioral feature), `verification-before-completion` (done = green gate + every promised module present), `systematic-debugging` (structured recovery when the gate is red).
@@ -26,9 +26,10 @@ project-kickoff/
 ├── hooks/
 │   ├── hooks.json                # SessionStart wiring
 │   └── greenfield-nudge.sh       # suggests /kickoff only in near-empty dirs
-├── skills/                       # the eight skills — the actual product
+├── skills/                       # the nine skills — the actual product
 │   ├── using-project-kickoff/
 │   ├── questionnaire/
+│   ├── design-import/
 │   ├── spec-authoring/
 │   ├── planning/
 │   ├── test-driven-development/
@@ -41,7 +42,7 @@ project-kickoff/
 ├── CLAUDE.md                     # dev-facing (working ON the plugin)
 ├── LICENSE                       # MIT
 ├── package.json
-├── PRD.md                        # build spec + audit history
+├── PRD.md                        # historical build spec (pre design-import) + audit history
 └── README.md
 ```
 
@@ -67,7 +68,7 @@ Then, in an empty directory, either wait for the session-start nudge or run (plu
 /project-kickoff:kickoff        # or just /kickoff
 ```
 
-Suggested first test input: SaaS, auth yes, Postgres, payments yes, multi-tenant yes, admin yes, no AI, no mobile, Vercel. Stop after `spec.md` and `plan.md` are produced and confirm the spine works before letting execution run.
+Suggested first test input: SaaS, auth yes, Postgres, payments yes, multi-tenant yes, admin yes, no AI, no mobile, Vercel, design source none. Stop after `spec.md` and `plan.md` are produced and confirm the spine works before letting execution run. (Answering the design question with a described direction instead exercises the conditional `design-import` stage.)
 
 ## Distribute
 
@@ -82,8 +83,8 @@ For separate stable/latest channels, or to keep the catalog in its own repo, see
 
 ## Versioning
 
-`version` is intentionally omitted from both manifests. For a git-hosted, actively developed plugin, Claude Code treats every new commit as a new version, which suits daily iteration. To pin releases later, set `version` in `plugin.json` only, and bump it each release. (The `spec_version` inside each generated `spec.md` is separate — it versions the generated spec format for resumability, not this plugin.)
+`version` is intentionally omitted from both manifests. For a git-hosted, actively developed plugin, Claude Code treats every new commit as a new version, which suits daily iteration. To pin releases later, set `version` in `plugin.json` only, and bump it each release. (The `Version:` header inside each generated `spec.md` is separate — it lets a resumed session detect a stale plan against a revised spec; it does not version this plugin.)
 
 ## The session-start nudge
 
-`hooks/greenfield-nudge.sh` runs at session start and suggests `/kickoff` only when the working directory is near-empty, so it stays silent in populated repos. It is fully defensive and always exits 0. If a future Claude Code version objects to the hook, delete `hooks/` and drop the hook checks from `tests/smoke-test.sh` — everything else works without it. (Do not declare the hooks file in `plugin.json`; `hooks/hooks.json` loads automatically, and a duplicate declaration prevents the plugin from loading.)
+`hooks/greenfield-nudge.sh` runs at session start (`startup|clear` only, so it doesn't re-fire on resume or compaction) and classifies the directory: near-empty → suggest `/kickoff`; kickoff artifacts present with work remaining → point at the resume path; completed kickoff project (plan fully checked) or any populated repo → silent. Artifacts are recognized by template header *plus* a chain-specific marker line, so a foreign `spec.md`/`plan.md` never matches. It is fully defensive and always exits 0; the smoke test exercises all four states. If a future Claude Code version objects to the hook, delete `hooks/` and drop the hook checks from `tests/smoke-test.sh` — everything else works without it. (Do not declare the hooks file in `plugin.json`; `hooks/hooks.json` loads automatically, and a duplicate declaration prevents the plugin from loading.)
